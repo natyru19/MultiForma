@@ -1,36 +1,5 @@
-type Product = {
-    id: string;
-    name: string;
-    image: string;
-    category: string;
-};
-
-const products: Product[] = [
-    {
-        id: "1",
-        name: "Llavero de auto",
-        image: "/images/llaveros.png",
-        category: "llaveros",
-    },
-    {
-        id: "2",
-        name: "Llavero de animales",
-        image: "/images/llaveros.png",
-        category: "llaveros",
-    },
-    {
-        id: "3",
-        name: "Florero moderno",
-        image: "/images/florero.png",
-        category: "decoracion",
-    },
-    {
-        id: "4",
-        name: "Parlante bluetooth",
-        image: "/images/parlante.png",
-        category: "accesorios",
-    },
-];
+import { supabase } from "@/lib/supabase";
+import Link from "next/link";
 
 export default async function CategoryDetail({
     params,
@@ -39,24 +8,36 @@ export default async function CategoryDetail({
     }) {
     const { id } = await params;
 
-    const filteredProducts = products.filter(
-        (product) => product.category.toLowerCase() === id.toLowerCase()
-    );
+    const { data: products, error } = await supabase
+        .from("products")
+        .select("*")
+        .eq("category_slug", id);
 
-    if (filteredProducts.length === 0) {
+    if (error) {
+        return <p>Error cargando productos</p>;
+    }
+
+    if (!products || products.length === 0) {
         return <p className="p-6">No hay productos en esta categoría</p>;
     }
 
     return (
         <div className="p-6">
-        <h1 className="text-2xl font-bold mb-6">{id}</h1>
+        <h1 className="text-2xl font-bold mb-6 capitalize">{id}</h1>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {filteredProducts.map((product) => (
-            <div key={product.id} className="border p-4 rounded">
-                <img src={product.image} className="w-full h-40 object-cover" />
+            {products.map((product: any) => (
+            <Link
+                key={product.id}
+                href={`/productos/${product.id}`}
+                className="border p-4 rounded hover:shadow"
+            >
+                <img
+                src={product.image}
+                className="w-full h-40 object-cover"
+                />
                 <p className="mt-2">{product.name}</p>
-            </div>
+            </Link>
             ))}
         </div>
         </div>
