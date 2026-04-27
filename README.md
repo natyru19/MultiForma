@@ -11,6 +11,8 @@ Ecommerce de diseños personalizados e impresión 3D.
 - Navegación por catálogo de productos
 - Filtrado de productos por categoría
 - Integración con base de datos (Supabase)
+- Implementación de carrito de compras
+- Persistencia del carrito en localStorage
 
 ---
 

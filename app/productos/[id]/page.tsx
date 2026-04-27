@@ -3,6 +3,8 @@
 import { use, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import VariantSelector from "@/components/VariantSelector";
+import AddToCartButton from "@/components/AddToCartButton";
+import BuyNowButton from "@/components/BuyNowButton";
 
 export default function ProductDetail({
     params,
@@ -103,7 +105,9 @@ export default function ProductDetail({
                 Stock: {selectedVariant.stock}
             </div>
             )}
-
+            
+            <AddToCartButton product={product} />
+            <BuyNowButton product={product} />
         </div>
         </div>
     );

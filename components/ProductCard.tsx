@@ -41,7 +41,7 @@ export default function ProductCard({ product }: { product: Product }) {
                 {minPrice ? `Desde $${minPrice}` : "Sin stock"}
             </p>
 
-            <button className="mt-4 w-full bg-black text-white py-2 rounded-lg hover:bg-gray-800 transition">
+            <button className="mt-4 w-full bg-[var(--primary)] hover:bg-[var(--primary-light)] py-2 rounded-lg">
                 Ver producto
             </button>
             </div>
