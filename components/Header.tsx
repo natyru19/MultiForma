@@ -13,15 +13,10 @@ export default function Header() {
                 </Link>
             </div>
 
-            <img 
-                src="https://rnyawemxuljswnfoepnj.supabase.co/storage/v1/object/public/product-images/logoMultiForma.png" 
-                alt="MultiForma"
-            />
-
             <nav className="flex gap-4 hover:text-gray-200">
                 <Link href="/" className="hover:underline">Inicio</Link>
-                <Link href="/productos" className="hover:underline">Catálogo</Link>
-                <Link href="/contacto" className="hover:underline">Contacto</Link>
+                <Link href="/products" className="hover:underline">Catálogo</Link>
+                <Link href="/contact" className="hover:underline">Contacto</Link>
             </nav>
         </header>
     );
