@@ -6,13 +6,21 @@ Ecommerce de diseños personalizados e impresión 3D.
 
 ## 🚀 Funcionalidades actuales
 
+### 🛍️ Frontend
 - Sección de productos destacados
 - Página de detalle de productos
-- Navegación por catálogo de productos
-- Filtrado de productos por categoría
-- Integración con base de datos (Supabase)
-- Implementación de carrito de compras
-- Persistencia del carrito en localStorage
+- Navegación por catálogo
+- Filtrado por categorías
+
+### ⚙️ Backend
+- Integración con Supabase
+- API para manejo de carrito
+- Persistencia de carrito en base de datos
+
+### 🛒 Carrito
+- Agregar productos
+- Actualizar cantidades
+- Persistencia en base de datos
 
 ---
 
