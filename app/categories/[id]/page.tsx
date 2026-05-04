@@ -29,7 +29,7 @@ export default async function CategoryDetail({
             {products.map((product: any) => (
             <Link
                 key={product.id}
-                href={`/productos/${product.id}`}
+                href={`/products/${product.id}`}
                 className="border p-4 rounded hover:shadow"
             >
                 <img

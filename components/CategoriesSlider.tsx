@@ -42,7 +42,7 @@ export default function CategoriesSlider({
             {visibleCategories.map((cat) => (
             <Link
                 key={cat.id}
-                href={`/categorias/${cat.slug}`}
+                href={`/categories/${cat.slug}`}
                 className="flex flex-col items-center"
             >
                 <img

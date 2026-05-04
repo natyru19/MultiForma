@@ -24,7 +24,7 @@ export default function ProductCard({ product }: { product: Product }) {
     : null;
 
     return (
-        <Link href={`/productos/${product.id}`}>
+        <Link href={`/products/${product.id}`}>
             <div className="border rounded-2xl p-4 shadow-md hover:shadow-xl transition">
 
             <img

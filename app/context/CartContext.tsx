@@ -12,12 +12,12 @@ type CartItem = {
 
 type CartContextType = {
     cart: CartItem[];
-    addToCart: (product: CartItem) => void;
+    addToCart: (productId: string, variantId: string) => Promise<void>;
 };
 
 const CartContext = createContext<CartContextType | null>(null);
 
-export function CartProvider({ children }: any) {
+export function CartProvider({ children }: { children: React.ReactNode }) {
     const [cart, setCart] = useState<CartItem[]>([]);
 
     useEffect(() => {
@@ -31,20 +31,43 @@ export function CartProvider({ children }: any) {
         localStorage.setItem("cart", JSON.stringify(cart));
     }, [cart]);
 
-    const addToCart = (product: CartItem) => {
-        setCart((prev) => {
-        const existing = prev.find((item) => item.id === product.id);
+    const addToCart = async (productId: string, variantId: string) => {
+        try {
+        const storedCartId = localStorage.getItem("cart_id");
 
-        if (existing) {
-            return prev.map((item) =>
-            item.id === product.id
-                ? { ...item, quantity: item.quantity + 1 }
-                : item
-            );
-        }
-
-        return [...prev, { ...product, quantity: 1 }];
+        const response = await fetch("/api/cart", {
+            method: "POST",
+            headers: {
+            "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+            product_id: productId,
+            variant_id: variantId,
+            cart_id: storedCartId,
+            }),
         });
+
+        const data = await response.json();
+
+        const items = data.data.items;
+
+        const formattedCart = items.map((item: any) => ({
+            id: item.products.id,
+            name: item.products.name,
+            price: item.variants.price,
+            image: item.products.image,
+            quantity: item.quantity,
+        }));
+
+        setCart(formattedCart);
+
+        const cartId = data.data.cart_id;
+        localStorage.setItem("cart_id", cartId);
+
+        console.log("Respuesta del backend:", data);
+        } catch (error) {
+        console.error("Error al agregar al carrito:", error);
+        }
     };
 
     return (
@@ -56,6 +79,8 @@ export function CartProvider({ children }: any) {
 
     export function useCart() {
     const context = useContext(CartContext);
-    if (!context) throw new Error("useCart debe usarse dentro de CartProvider");
+    if (!context) {
+        throw new Error("useCart debe usarse dentro de CartProvider");
+    }
     return context;
 }

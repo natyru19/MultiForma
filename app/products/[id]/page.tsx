@@ -47,68 +47,77 @@ export default function ProductDetail({
     return (
         <div className="p-6 max-w-5xl mx-auto grid md:grid-cols-2 gap-10">
 
-        <div className="flex flex-col items-center">
+            <div className="flex flex-col items-center">
 
-            <img
-            src={selectedVariant?.image || images[currentIndex]}
-            className="w-full max-h-96 object-contain rounded-xl border"
-            />
-
-            <div className="flex justify-between w-full mt-2">
-            <button onClick={() => setCurrentIndex((prev) => Math.max(prev - 1, 0))}>
-                ◀
-            </button>
-
-            <button
-                onClick={() =>
-                setCurrentIndex((prev) =>
-                    Math.min(prev + 1, images.length - 1)
-                )
-                }
-            >
-                ▶
-            </button>
-            </div>
-
-            <div className="flex gap-2 mt-4">
-            {images.map((img: string, i: number) => (
                 <img
-                key={i}
-                src={img}
-                onClick={() => setCurrentIndex(i)}
-                className="w-16 h-16 object-cover rounded cursor-pointer border"
+                src={selectedVariant?.image || images[currentIndex]}
+                className="w-full max-h-96 object-contain rounded-xl border"
                 />
-            ))}
+
+                <div className="flex justify-between w-full mt-2">
+                    <button onClick={() => setCurrentIndex((prev) => Math.max(prev - 1, 0))}>
+                        ◀
+                    </button>
+
+                    <button
+                        onClick={() =>
+                        setCurrentIndex((prev) =>
+                            Math.min(prev + 1, images.length - 1)
+                        )
+                        }
+                    >
+                        ▶
+                    </button>
+                </div>
+
+                <div className="flex gap-2 mt-4">
+                {images.map((img: string, i: number) => (
+                    <img
+                    key={i}
+                    src={img}
+                    onClick={() => setCurrentIndex(i)}
+                    className="w-16 h-16 object-cover rounded cursor-pointer border"
+                    />
+                ))}
+                </div>
             </div>
-        </div>
 
-        <div>
+            <div>
 
-            <h1 className="text-3xl font-bold">{product.name}</h1>
+                <h1 className="text-3xl font-bold">{product.name}</h1>
 
-            <p className="text-gray-500 mt-2">
-            {product.description}
-            </p>
+                <p className="text-gray-500 mt-2">
+                {product.description}
+                </p>
 
-            <VariantSelector
-            product={product}
-            selectedTipo={selectedTipo}
-            selectedColor={selectedColor}
-            setSelectedTipo={setSelectedTipo}
-            setSelectedColor={setSelectedColor}
-            />
+                <VariantSelector
+                product={product}
+                selectedTipo={selectedTipo}
+                selectedColor={selectedColor}
+                setSelectedTipo={setSelectedTipo}
+                setSelectedColor={setSelectedColor}
+                />
 
-            {selectedVariant && (
-            <div className="mt-6 text-xl font-semibold">
-                Precio: ${selectedVariant.price}
-                <br />
-                Stock: {selectedVariant.stock}
+                {selectedVariant && (
+                <div className="mt-6 text-xl font-semibold">
+                    Precio: ${selectedVariant.price}
+                    <br />
+                    Stock: {selectedVariant.stock}
+                </div>
+                )}
+                
+                <div className="mt-6 space-y-3">
+                    <AddToCartButton
+                        productId={product.id}
+                        variantId={selectedVariant?.id}
+                    />
+
+                    <BuyNowButton
+                        productId={product.id}
+                        variantId={selectedVariant?.id}
+                    />
+                </div>
             </div>
-            )}
-            
-            <AddToCartButton product={product} />
-            <BuyNowButton product={product} />
-        </div>
         </div>
     );
 }

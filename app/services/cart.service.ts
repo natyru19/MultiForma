@@ -3,10 +3,12 @@ import { supabase } from '@/lib/supabase';
 export const cartService = {
     async addToCart({
         product_id,
+        variant_id,
         cart_id,
         quantity,
     }: {
         product_id: string;
+        variant_id: string;
         cart_id?: string;
         quantity: number;
     }) {
@@ -30,7 +32,8 @@ export const cartService = {
         .select('*')
         .eq('cart_id', currentCartId)
         .eq('product_id', product_id)
-        .single();
+        .eq('variant_id', variant_id)
+        .maybeSingle();
 
         if (existingItem) {
         await supabase
@@ -45,6 +48,7 @@ export const cartService = {
             .insert({
             cart_id: currentCartId,
             product_id,
+            variant_id,
             quantity,
             });
         }
@@ -53,7 +57,8 @@ export const cartService = {
         .from('cart_items')
         .select(`
             *,
-            products (*)
+            products (*),
+            variants (*)
         `)
         .eq('cart_id', currentCartId);
 
