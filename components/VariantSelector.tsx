@@ -2,23 +2,23 @@
 
 type Variant = {
     id: string;
-    tipo: string;
+    option: string;
     color: string;
 };
 
 export default function VariantSelector({
     product,
-    selectedTipo,
+    selectedOption,
     selectedColor,
-    setSelectedTipo,
+    setSelectedOption,
     setSelectedColor
 }: any) {
 
-    const tipos = [
-    ...new Set(product.variants.map((v: Variant) => v.tipo))
+    const options = [
+    ...new Set(product.variants.map((v: Variant) => v.option))
     ] as string[];
 
-    const colores = [
+    const colors = [
     ...new Set(product.variants.map((v: Variant) => v.color))
     ] as string[];
 
@@ -26,17 +26,17 @@ export default function VariantSelector({
         <div className="mt-6">
 
         <div className="mb-4">
-            <p className="font-semibold">Tipo</p>
+            <p className="font-semibold">Opción</p>
             <div className="flex gap-2 mt-2">
-            {tipos.map((tipo) => (
+            {options.map((option) => (
                 <button
-                key={tipo}
-                onClick={() => setSelectedTipo(tipo)}
+                key={option}
+                onClick={() => setSelectedOption(option)}
                 className={`px-3 py-1 rounded border ${
-                    selectedTipo === tipo ? "bg-white text-black" : ""
+                    selectedOption === option ? "bg-white text-black" : ""
                 }`}
                 >
-                {tipo}
+                {option}
                 </button>
             ))}
             </div>
@@ -45,7 +45,7 @@ export default function VariantSelector({
         <div className="mb-4">
             <p className="font-semibold">Color</p>
             <div className="flex gap-2 mt-2">
-            {colores.map((color) => (
+            {colors.map((color) => (
                 <button
                 key={color}
                 onClick={() => setSelectedColor(color)}

@@ -14,7 +14,7 @@ export default function ProductDetail({
     const { id } = use(params);
 
     const [product, setProduct] = useState<any>(null);
-    const [selectedTipo, setSelectedTipo] = useState("");
+    const [selectedOption, setSelectedOption] = useState("");
     const [selectedColor, setSelectedColor] = useState("");
     const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -39,7 +39,7 @@ export default function ProductDetail({
 
     const selectedVariant = product.variants.find(
         (v: any) =>
-        v.tipo === selectedTipo && v.color === selectedColor
+        v.option === selectedOption && v.color === selectedColor
     );
 
     const images = product.variants.map((v: any) => v.image);
@@ -92,9 +92,9 @@ export default function ProductDetail({
 
                 <VariantSelector
                 product={product}
-                selectedTipo={selectedTipo}
+                selectedOption={selectedOption}
                 selectedColor={selectedColor}
-                setSelectedTipo={setSelectedTipo}
+                setSelectedOption={setSelectedOption}
                 setSelectedColor={setSelectedColor}
                 />
 
