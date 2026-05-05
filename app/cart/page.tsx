@@ -5,6 +5,10 @@ import { useCart } from "@/app/context/CartContext";
 export default function CartPage() {
     const { cart } = useCart();
 
+    const total = cart.reduce(
+        (acc, item) => acc + item.price * item.quantity, 0
+    );
+
     return (
         <div className="p-6 max-w-4xl mx-auto">
         <h1 className="text-2xl font-bold mb-6">Carrito</h1>
@@ -16,16 +20,32 @@ export default function CartPage() {
             {cart.map((item) => (
                 <div
                 key={`${item.id}-${item.variant_id}`}
-                className="border p-4 rounded flex justify-between"
+                className="border p-4 rounded"
                 >
-                <div>
+                
                     <p className="font-semibold">{item.name}</p>
-                    <p>Cantidad: {item.quantity}</p>
-                </div>
+                    
+                    <div className="text-sm text-gray-500">
+                        {item.option && <p>Opción: {item.option}</p>}
+                        {item.color && <p>Color: {item.color}</p>}
+                    </div>
 
-                <p>${item.price}</p>
+                    <div className="flex justify-between mt-2">
+                        <p>
+                            ${item.price} x {item.quantity}
+                        </p>
+
+                        <p className="font-semibold">
+                            ${item.price * item.quantity}
+                        </p>
+                    </div>
                 </div>
             ))}
+
+                <div className="mt-6 text-right border-t pt-4">
+                    <p className="text-lg">Total:</p>
+                    <p className="text-2xl font-bold">${total}</p>
+                </div>
             </div>
         )}
         </div>

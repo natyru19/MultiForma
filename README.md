@@ -18,9 +18,15 @@ Ecommerce de diseños personalizados e impresión 3D.
 - Persistencia de carrito en base de datos
 
 ### 🛒 Carrito
-- Agregar productos
-- Actualizar cantidades
-- Persistencia en base de datos
+- Agregar productos con variantes
+- Actualización automática de cantidades
+- Persistencia en base de datos (Supabase)
+- Identificación de carrito mediante localStorage
+- Validación de selección de variantes antes de agregar
+- Selector de variantes dinámico (oculta opciones inválidas)
+- Autoselección de variantes cuando existe una única opción
+- Visualización de variantes en el carrito (opción/color)
+- Cálculo de precio unitario, subtotal por producto y total del carrito
 
 ---
 

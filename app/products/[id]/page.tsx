@@ -37,10 +37,14 @@ export default function ProductDetail({
 
     if (!product) return <p className="p-6">Cargando...</p>;
 
-    const selectedVariant = product.variants.find(
-        (v: any) =>
-        v.option === selectedOption && v.color === selectedColor
-    );
+    const selectedVariant = product.variants.find((v: any) => {
+        const matchOption = v.option === selectedOption;
+        const matchColor = v.color
+            ? v.color === selectedColor
+            : true;
+
+        return matchOption && matchColor;
+    });
 
     const images = product.variants.map((v: any) => v.image);
 

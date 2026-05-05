@@ -9,6 +9,8 @@ type CartItem = {
     price: number;
     image: string;
     quantity: number;
+    option?: string;
+    color?: string;
 };
 
 type CartContextType = {
@@ -59,8 +61,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
             price: item.variants?.price || 0,
             image: item.products.image,
             quantity: item.quantity,
-            option: item.variants?.option,
-            color: item.variants?.color
+            option: item.variants?.option || undefined,
+            color: item.variants?.color || undefined,
         }));
 
         setCart(formattedCart);
