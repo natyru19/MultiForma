@@ -3,7 +3,7 @@
 import { useCart } from "@/app/context/CartContext";
 
 export default function CartPage() {
-    const { cart } = useCart();
+    const { cart, updateItemQuantity, removeItem } = useCart();
 
     const total = cart.reduce(
         (acc, item) => acc + item.price * item.quantity, 0
@@ -17,30 +17,68 @@ export default function CartPage() {
             <p>El carrito está vacío</p>
         ) : (
             <div className="space-y-4">
-            {cart.map((item) => (
-                <div
-                key={`${item.id}-${item.variant_id}`}
-                className="border p-4 rounded"
-                >
-                
-                    <p className="font-semibold">{item.name}</p>
-                    
-                    <div className="text-sm text-gray-500">
-                        {item.option && <p>Opción: {item.option}</p>}
-                        {item.color && <p>Color: {item.color}</p>}
-                    </div>
+                {cart.map((item) => (
+                    <div
+                        key={`${item.id}-${item.variant_id}`}
+                        className="border p-4 rounded flex justify-between items-center"
+                    >
+                        <div>
+                        <p className="font-semibold">{item.name}</p>
 
-                    <div className="flex justify-between mt-2">
-                        <p>
-                            ${item.price} x {item.quantity}
+                        <div className="text-sm text-gray-500">
+                            {item.option && <p>Option: {item.option}</p>}
+                            {item.color && <p>Color: {item.color}</p>}
+                        </div>
+
+                        <p className="mt-1 text-sm">
+                            ${item.price} c/u
                         </p>
+                        </div>
 
-                        <p className="font-semibold">
+                        <div className="flex items-center gap-4">
+
+                        <div className="flex items-center gap-2">
+                            <button
+                            onClick={() => {
+                                if (item.quantity > 1) {
+                                updateItemQuantity(item.cart_item_id, item.quantity - 1);
+                                }
+                            }}
+                            disabled={item.quantity === 1}
+                            className={`px-2 border rounded ${
+                                item.quantity === 1 ? "opacity-50 cursor-not-allowed" : ""
+                            }`}
+                            >
+                            -
+                            </button>
+
+                            <span>{item.quantity}</span>
+
+                            <button
+                            onClick={() =>
+                                updateItemQuantity(item.cart_item_id, item.quantity + 1)
+                            }
+                            className="px-2 border rounded"
+                            >
+                            +
+                            </button>
+                        </div>
+
+                        <p className="font-semibold w-20 text-right">
                             ${item.price * item.quantity}
                         </p>
+
+                        <button
+                            onClick={() => removeItem(item.cart_item_id)}
+                            className="text-red-500 hover:text-red-700 text-lg"
+                            title="Eliminar producto"
+                        >
+                            ❌
+                        </button>
+
+                        </div>
                     </div>
-                </div>
-            ))}
+                ))}
 
                 <div className="mt-6 text-right border-t pt-4">
                     <p className="text-lg">Total:</p>

@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 
 type CartItem = {
     id: string;
+    cart_item_id: string;
     variant_id: string;
     name: string;
     price: number;
@@ -16,6 +17,8 @@ type CartItem = {
 type CartContextType = {
     cart: CartItem[];
     addToCart: (productId: string, variantId: string) => Promise<void>;
+    updateItemQuantity: (cart_item_id: string, quantity: number) => Promise<void>;
+    removeItem: (cart_item_id: string) => Promise<void>;
 };
 
 const CartContext = createContext<CartContextType | null>(null);
@@ -56,6 +59,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
         const formattedCart = items.map((item: any) => ({
             id: item.products.id,
+            cart_item_id: item.id,
             variant_id: item.variants.id,
             name: item.products.name,
             price: item.variants?.price || 0,
@@ -76,8 +80,48 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         }
     };
 
+    const updateItemQuantity = async (cart_item_id: string, quantity: number) => {
+        try {
+            await fetch("/api/cart", {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ cart_item_id, quantity }),
+            });
+
+            setCart((prev) =>
+                prev
+                    .map((item) =>
+                        item.cart_item_id === cart_item_id
+                            ? { ...item, quantity }
+                            : item
+                    )
+                    .filter((item) => item.quantity > 0)
+            );
+
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const removeItem = async (cart_item_id: string) => {
+        try {
+            await fetch("/api/cart", {
+                method: "DELETE",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ cart_item_id }),
+            });
+
+            setCart((prev) =>
+                prev.filter((item) => item.cart_item_id !== cart_item_id)
+            );
+
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
     return (
-        <CartContext.Provider value={{ cart, addToCart }}>
+        <CartContext.Provider value={{ cart, addToCart, updateItemQuantity, removeItem }}>
         {children}
         </CartContext.Provider>
     );

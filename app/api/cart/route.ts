@@ -28,3 +28,44 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });
     }
 }
+
+export async function PATCH(request: Request) {
+    try {
+        const body = await request.json();
+        const { cart_item_id, quantity } = body;
+
+        if (!cart_item_id) {
+            return Response.json({ error: "cart_item_id requerido" }, { status: 400 });
+        }
+
+        if (quantity < 1) {
+            return Response.json({ error: "Cantidad inválida" }, { status: 400 });
+        }
+
+        await cartService.updateQuantity(cart_item_id, quantity);
+
+        return Response.json({ message: "Cantidad actualizada" });
+    } catch (error) {
+        console.error('Error al modificar el carrito:', error);
+        return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });        
+    }
+}
+
+export async function DELETE(request: Request) {
+    try {
+        const body = await request.json();
+        const { cart_item_id } = body;
+
+        if (!cart_item_id) {
+            return Response.json({ error: "cart_item_id requerido" }, { status: 400 });
+        }
+
+        await cartService.removeItem(cart_item_id);
+
+        return Response.json({ message: "Item eliminado" });
+
+    } catch (error) {
+        console.error(error);
+        return Response.json({ error: "Error interno" }, { status: 500 });
+    }
+}

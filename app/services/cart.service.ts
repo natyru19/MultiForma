@@ -67,4 +67,18 @@ export const cartService = {
         items: cart,
         };
     },
+
+    async updateQuantity(cart_item_id: string, quantity: number) {
+        await supabase
+            .from("cart_items")
+            .update({ quantity })
+            .eq("id", cart_item_id);
+    },
+
+    async removeItem(cart_item_id: string) {
+        await supabase
+            .from("cart_items")
+            .delete()
+            .eq("id", cart_item_id);
+    },
 };

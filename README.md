@@ -19,13 +19,12 @@ Ecommerce de diseños personalizados e impresión 3D.
 
 ### 🛒 Carrito
 - Agregar productos con variantes
-- Actualización automática de cantidades
 - Persistencia en base de datos (Supabase)
 - Identificación de carrito mediante localStorage
-- Validación de selección de variantes antes de agregar
-- Selector de variantes dinámico (oculta opciones inválidas)
-- Autoselección de variantes cuando existe una única opción
-- Visualización de variantes en el carrito (opción/color)
+- Actualización dinámica de cantidades (+ / -)
+- Restricción de cantidad mínima (no permite valores menores a 1)
+- Eliminación directa de productos del carrito (sincronizada con base de datos)
+- Visualización de variantes (opción/color)
 - Cálculo de precio unitario, subtotal por producto y total del carrito
 
 ---
