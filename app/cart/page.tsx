@@ -1,9 +1,11 @@
 "use client";
 
 import { useCart } from "@/app/context/CartContext";
+import { useRouter } from "next/navigation";
 
 export default function CartPage() {
     const { cart, updateItemQuantity, removeItem } = useCart();
+    const router = useRouter();
 
     const total = cart.reduce(
         (acc, item) => acc + item.price * item.quantity, 0
@@ -84,6 +86,13 @@ export default function CartPage() {
                     <p className="text-lg">Total:</p>
                     <p className="text-2xl font-bold">${total}</p>
                 </div>
+
+                <button
+                    onClick={() => router.push("/checkout")}
+                    className="bg-[var(--primary)] text-white px-6 py-3 rounded-lg hover:bg-[var(--primary-light)] transition"
+                >
+                    Finalizar compra
+                </button>
             </div>
         )}
         </div>

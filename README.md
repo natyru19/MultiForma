@@ -16,6 +16,8 @@ Ecommerce de diseños personalizados e impresión 3D.
 - Integración con Supabase
 - API para manejo de carrito
 - Persistencia de carrito en base de datos
+- Creación de órdenes (orders) con persistencia en base de datos
+- Asociación de productos y variantes a cada orden (order_items)
 
 ### 🛒 Carrito
 - Agregar productos con variantes
@@ -26,6 +28,12 @@ Ecommerce de diseños personalizados e impresión 3D.
 - Eliminación directa de productos del carrito (sincronizada con base de datos)
 - Visualización de variantes (opción/color)
 - Cálculo de precio unitario, subtotal por producto y total del carrito
+- Integración con flujo de checkout para generación de órdenes
+
+### 🧾 Checkout
+- Formulario de datos del cliente
+- Resumen del pedido
+- Creación de orden con productos y variantes asociados
 
 ---
 

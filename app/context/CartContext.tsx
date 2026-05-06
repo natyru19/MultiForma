@@ -5,6 +5,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 type CartItem = {
     id: string;
     cart_item_id: string;
+    product_id: string;
     variant_id: string;
     name: string;
     price: number;
@@ -60,6 +61,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         const formattedCart = items.map((item: any) => ({
             id: item.products.id,
             cart_item_id: item.id,
+            product_id: item.products.id,
             variant_id: item.variants.id,
             name: item.products.name,
             price: item.variants?.price || 0,
