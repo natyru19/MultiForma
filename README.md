@@ -29,11 +29,14 @@ Ecommerce de diseños personalizados e impresión 3D.
 - Visualización de variantes (opción/color)
 - Cálculo de precio unitario, subtotal por producto y total del carrito
 - Integración con flujo de checkout para generación de órdenes
+- Eliminación automática del carrito después de completar la compra
 
 ### 🧾 Checkout
 - Formulario de datos del cliente
 - Resumen del pedido
 - Creación de orden con productos y variantes asociados
+- Limpieza automática del carrito luego de la compra
+- Pantalla de confirmación de compra
 
 ---
 

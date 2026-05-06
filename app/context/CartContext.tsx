@@ -20,6 +20,7 @@ type CartContextType = {
     addToCart: (productId: string, variantId: string) => Promise<void>;
     updateItemQuantity: (cart_item_id: string, quantity: number) => Promise<void>;
     removeItem: (cart_item_id: string) => Promise<void>;
+    clearCart: () => Promise<void>;
 };
 
 const CartContext = createContext<CartContextType | null>(null);
@@ -122,8 +123,30 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         }
     };
 
+    const clearCart = async () => {
+        try {
+            const cartId = localStorage.getItem("cart_id");
+
+            if (!cartId) return;
+
+            await fetch("/api/cart/clear", {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ cart_id: cartId }),
+            });
+
+            localStorage.removeItem("cart_id");
+            setCart([]);
+
+        } catch (error) {
+            console.error("Error limpiando carrito:", error);
+        }
+    };
+
     return (
-        <CartContext.Provider value={{ cart, addToCart, updateItemQuantity, removeItem }}>
+        <CartContext.Provider value={{ cart, addToCart, updateItemQuantity, removeItem, clearCart }}>
         {children}
         </CartContext.Provider>
     );

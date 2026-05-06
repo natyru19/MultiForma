@@ -2,10 +2,12 @@
 
 import { useCart } from "@/app/context/CartContext";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function CheckoutPage() {
 
-    const { cart } = useCart();
+    const { cart, clearCart } = useCart();
+    const router = useRouter();
 
     const total = cart.reduce(
         (acc, item) => acc + item.price * item.quantity,
@@ -29,21 +31,21 @@ export default function CheckoutPage() {
     const handleCheckout = async () => {
         try {
             const response = await fetch("/api/orders", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                cart,
-                form,
-            }),
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    cart,
+                    form,
+                }),
             });
 
             const data = await response.json();
 
-            console.log("Orden creada:", data);
+            await clearCart();
 
-            alert("Compra realizada con éxito 🎉");
+            router.push("/success");
 
         } catch (error) {
             console.error(error);
