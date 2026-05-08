@@ -137,7 +137,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
             body: JSON.stringify({ cart_id: cartId }),
             });
 
+            await fetch(`/api/cart/${cartId}`, {
+                method: "DELETE",
+            });
+
             localStorage.removeItem("cart_id");
+            localStorage.removeItem("cart");
             setCart([]);
 
         } catch (error) {

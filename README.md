@@ -4,39 +4,25 @@ Ecommerce de diseños personalizados e impresión 3D.
 
 ---
 
-## 🚀 Funcionalidades actuales
+## 🚀 Funcionalidades
 
-### 🛍️ Frontend
-- Sección de productos destacados
-- Página de detalle de productos
-- Navegación por catálogo
-- Filtrado por categorías
-
-### ⚙️ Backend
+### ⚙️ Backend y lógica de negocio
 - Integración con Supabase
 - API para manejo de carrito
 - Persistencia de carrito en base de datos
-- Creación de órdenes (orders) con persistencia en base de datos
-- Asociación de productos y variantes a cada orden (order_items)
+- Manejo de variantes de productos
+- Actualización dinámica de cantidades
+- Restricción de cantidad mínima por producto
+- Eliminación sincronizada de productos en carrito
+- Generación de órdenes y detalle de compra
+- Limpieza automática del carrito luego de finalizar la compra
+- Integración con API de Mercado Pago (sandbox)
 
-### 🛒 Carrito
-- Agregar productos con variantes
-- Persistencia en base de datos (Supabase)
-- Identificación de carrito mediante localStorage
-- Actualización dinámica de cantidades (+ / -)
-- Restricción de cantidad mínima (no permite valores menores a 1)
-- Eliminación directa de productos del carrito (sincronizada con base de datos)
-- Visualización de variantes (opción/color)
-- Cálculo de precio unitario, subtotal por producto y total del carrito
-- Integración con flujo de checkout para generación de órdenes
-- Eliminación automática del carrito después de completar la compra
-
-### 🧾 Checkout
-- Formulario de datos del cliente
-- Resumen del pedido
-- Creación de orden con productos y variantes asociados
-- Limpieza automática del carrito luego de la compra
-- Pantalla de confirmación de compra
+### 🛍️ Frontend
+- Navegación por catálogo
+- Página de detalle de productos
+- Visualización dinámica de variantes
+- Resumen de compra y checkout
 
 ---
 
@@ -47,6 +33,7 @@ Ecommerce de diseños personalizados e impresión 3D.
 - TypeScript
 - Tailwind CSS
 - PostgreSQL (Supabase)
+- API de Mercado Pago
 
 ---
 

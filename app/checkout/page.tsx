@@ -2,12 +2,10 @@
 
 import { useCart } from "@/app/context/CartContext";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 
 export default function CheckoutPage() {
 
-    const { cart, clearCart } = useCart();
-    const router = useRouter();
+    const { cart } = useCart();
 
     const total = cart.reduce(
         (acc, item) => acc + item.price * item.quantity,
@@ -30,22 +28,23 @@ export default function CheckoutPage() {
 
     const handleCheckout = async () => {
         try {
-            const response = await fetch("/api/orders", {
+            const res = await fetch("/api/create-preference", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    cart,
-                    form,
+                    items: cart.map((item) => ({
+                        title: item.name,
+                        quantity: item.quantity,
+                        unit_price: item.price,
+                    })),
                 }),
             });
 
-            const data = await response.json();
+            const data = await res.json();
 
-            await clearCart();
-
-            router.push("/success");
+            window.location.href = data.init_point;
 
         } catch (error) {
             console.error(error);
@@ -62,8 +61,8 @@ export default function CheckoutPage() {
                     <p className="font-semibold">{item.name}</p>
 
                     <p className="text-sm text-gray-500">
-                    {item.option && `Option: ${item.option}`}
-                    {item.color && ` | Color: ${item.color}`}
+                        {item.option && `Option: ${item.option}`}
+                        {item.color && ` | Color: ${item.color}`}
                     </p>
 
                     <p>Cantidad: {item.quantity}</p>
@@ -73,7 +72,6 @@ export default function CheckoutPage() {
             </div>
 
             <div className="mt-8 space-y-4">
-
                 <h2 className="text-xl font-bold">Datos del cliente</h2>
 
                 <input
@@ -103,7 +101,6 @@ export default function CheckoutPage() {
                     onChange={handleChange}
                     className="w-full border p-2 rounded"
                 />
-
             </div>
 
             <div className="mt-6 text-xl font-bold">
@@ -113,8 +110,8 @@ export default function CheckoutPage() {
             <button
                 onClick={handleCheckout}
                 className="mt-6 bg-green-600 text-white px-6 py-3 rounded-lg"
-                >
-                Confirmar compra
+            >
+                Pagar con MercadoPago
             </button>
         </div>
     );
