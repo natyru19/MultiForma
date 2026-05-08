@@ -17,6 +17,8 @@ Ecommerce de diseños personalizados e impresión 3D.
 - Generación de órdenes y detalle de compra
 - Limpieza automática del carrito luego de finalizar la compra
 - Integración con API de Mercado Pago (sandbox)
+- Webhooks de Mercado Pago
+- Metadata personalizada de pagos
 
 ### 🛍️ Frontend
 - Navegación por catálogo
@@ -34,6 +36,7 @@ Ecommerce de diseños personalizados e impresión 3D.
 - Tailwind CSS
 - PostgreSQL (Supabase)
 - API de Mercado Pago
+- ngrok
 
 ---
 
@@ -42,3 +45,14 @@ Ecommerce de diseños personalizados e impresión 3D.
 ```bash
 npm install
 npm run dev
+```
+
+---
+
+## 📡 Endpoint de Webhooks
+
+```txt
+/api/webhooks/mercadopago
+```
+
+Durante el desarrollo local se utiliza ngrok para exponer el servidor y permitir que Mercado Pago envíe las notificaciones correctamente.

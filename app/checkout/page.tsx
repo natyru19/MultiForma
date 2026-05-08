@@ -27,6 +27,8 @@ export default function CheckoutPage() {
     };
 
     const handleCheckout = async () => {
+        const cartId = localStorage.getItem("cart_id");
+
         try {
             const res = await fetch("/api/create-preference", {
                 method: "POST",
@@ -39,6 +41,9 @@ export default function CheckoutPage() {
                         quantity: item.quantity,
                         unit_price: item.price,
                     })),
+
+                    cartId,
+                    form,
                 }),
             });
 

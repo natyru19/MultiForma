@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
     const body = await req.json();
+    const { items, cartId, form } = body;
 
     const response = await fetch("https://api.mercadopago.com/checkout/preferences", {
         method: "POST",
@@ -10,10 +11,17 @@ export async function POST(req: Request) {
             Authorization: `Bearer ${process.env.MP_ACCESS_TOKEN}`,
         },
         body: JSON.stringify({
-            items: body.items.map((item: any) => ({
+            items: items.map((item: any) => ({
                 ...item,
                 currency_id: "UYU",
             })),
+
+            notification_url: "https://squeak-sneeze-unviable.ngrok-free.dev/api/webhooks/mercadopago",
+
+            metadata: {
+                cart_id: cartId,
+                customer: form,
+            },
 
             back_urls: {
                 success: "http://localhost:3000/success",
