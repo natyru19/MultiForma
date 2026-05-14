@@ -114,11 +114,13 @@ export default function ProductDetail({
                     <AddToCartButton
                         productId={product.id}
                         variantId={selectedVariant?.id}
+                        price={selectedVariant?.price}
                     />
 
                     <BuyNowButton
                         productId={product.id}
                         variantId={selectedVariant?.id}
+                        price={selectedVariant?.price}
                     />
                 </div>
             </div>

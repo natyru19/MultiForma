@@ -5,9 +5,11 @@ import { useCart } from "@/app/context/CartContext";
 export default function AddToCartButton({
     productId,
     variantId,
+    price,
     }: {
     productId: string;
     variantId: string;
+    price: number;
     }) {
     const { addToCart } = useCart();
 
@@ -17,7 +19,7 @@ export default function AddToCartButton({
         return;
         }
 
-        addToCart(productId, variantId);
+        addToCart(productId, variantId, price);
     };
 
     return (

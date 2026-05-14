@@ -8,7 +8,7 @@ export async function GET() {
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        let { product_id, variant_id, cart_id, quantity } = body;
+        let { product_id, variant_id, cart_id, quantity, price } = body;
 
         if(!product_id) {
             return NextResponse.json({ error: 'El dato es requerido' }, { status: 400 });
@@ -19,8 +19,8 @@ export async function POST(request: Request) {
         }   
 
         quantity = quantity || 1;
-
-        const result = await cartService.addToCart({product_id, variant_id, cart_id, quantity});
+        price = price || 0;
+        const result = await cartService.addToCart({product_id, variant_id, cart_id, quantity, price});
 
         return NextResponse.json({ message: 'Success', data: result }, { status: 200 });
     } catch (error) {

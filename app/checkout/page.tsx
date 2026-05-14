@@ -49,7 +49,11 @@ export default function CheckoutPage() {
 
             const data = await res.json();
 
-            window.location.href = data.init_point;
+            if (data.init_point) {
+                window.location.href = data.init_point;
+            } else {
+                console.error("Mercado Pago error:", data);
+            }
 
         } catch (error) {
             console.error(error);

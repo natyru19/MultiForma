@@ -17,7 +17,7 @@ type CartItem = {
 
 type CartContextType = {
     cart: CartItem[];
-    addToCart: (productId: string, variantId: string) => Promise<void>;
+    addToCart: (productId: string, variantId: string, price: number) => Promise<void>;
     updateItemQuantity: (cart_item_id: string, quantity: number) => Promise<void>;
     removeItem: (cart_item_id: string) => Promise<void>;
     clearCart: () => Promise<void>;
@@ -39,7 +39,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         localStorage.setItem("cart", JSON.stringify(cart));
     }, [cart]);
 
-    const addToCart = async (productId: string, variantId: string) => {
+    const addToCart = async (productId: string, variantId: string, price: number) => {
         try {
         const storedCartId = localStorage.getItem("cart_id");
 
@@ -51,6 +51,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
             body: JSON.stringify({
             product_id: productId,
             variant_id: variantId,
+            price,
             cart_id: storedCartId,
             }),
         });
@@ -59,17 +60,21 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
         const items = data.data.items;
 
+        console.log("DATA CART:", data);
+
+        console.log("ITEMS:", items);
+
         const formattedCart = items.map((item: any) => ({
-            id: item.products.id,
+            id: item.products?.id,
             cart_item_id: item.id,
-            product_id: item.products.id,
-            variant_id: item.variants.id,
-            name: item.products.name,
-            price: item.variants?.price || 0,
-            image: item.products.image,
+            product_id: item.product_id,
+            variant_id: item.variant_id,
+            name: item.products?.name,
+            price: item.variants?.price,
+            image: item.products?.image,
             quantity: item.quantity,
-            option: item.variants?.option || undefined,
-            color: item.variants?.color || undefined,
+            option: item.variants?.option,
+            color: item.variants?.color,
         }));
 
         setCart(formattedCart);

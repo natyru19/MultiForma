@@ -6,11 +6,13 @@ export const cartService = {
         variant_id,
         cart_id,
         quantity,
+        price,
     }: {
         product_id: string;
         variant_id: string;
         cart_id?: string;
         quantity: number;
+        price: number;
     }) {
 
         let currentCartId = cart_id;
@@ -50,6 +52,7 @@ export const cartService = {
             product_id,
             variant_id,
             quantity,
+            price,
             });
         }
 

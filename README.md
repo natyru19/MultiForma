@@ -19,6 +19,8 @@ Ecommerce de diseños personalizados e impresión 3D.
 - Integración con API de Mercado Pago (sandbox)
 - Webhooks de Mercado Pago
 - Metadata personalizada de pagos
+- Prevención de órdenes duplicadas
+- Guardado de información del cliente
 
 ### 🛍️ Frontend
 - Navegación por catálogo
@@ -36,6 +38,7 @@ Ecommerce de diseños personalizados e impresión 3D.
 - Tailwind CSS
 - PostgreSQL (Supabase)
 - API de Mercado Pago
+- Webhooks de Mercado Pago
 - ngrok
 
 ---
@@ -46,6 +49,21 @@ Ecommerce de diseños personalizados e impresión 3D.
 npm install
 npm run dev
 ```
+
+---
+
+## 🔑 Variables de entorno
+
+Crear un archivo `.env.local` en la raíz de la carpeta `MULTIFORMA`.
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=tu_url_supabase 
+NEXT_PUBLIC_SUPABASE_ANON_KEY=tu_supabase_anon_key
+MP_ACCESS_TOKEN=mp_access_token 
+NEXT_PUBLIC_MP_PUBLIC_KEY=mp_public_key
+```
+
+Estas variables permiten conectar la aplicación con Supabase y Mercado Pago.
 
 ---
 

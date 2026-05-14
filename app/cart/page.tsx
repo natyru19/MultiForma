@@ -28,7 +28,7 @@ export default function CartPage() {
                         <p className="font-semibold">{item.name}</p>
 
                         <div className="text-sm text-gray-500">
-                            {item.option && <p>Option: {item.option}</p>}
+                            {item.option && <p>Opción: {item.option}</p>}
                             {item.color && <p>Color: {item.color}</p>}
                         </div>
 
