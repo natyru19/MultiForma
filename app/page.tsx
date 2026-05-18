@@ -1,11 +1,17 @@
 import ProductCard from "@/components/ProductCard";
 import { getCategories } from "@/lib/getCategories";
 import CategoriesSlider from "@/components/CategoriesSlider";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/server";
 
 export default async function Home() {
+
+  const supabase = await createClient();
+
   const categories = await getCategories();
-  const { data: products, error } = await supabase.from("products").select(`
+  
+  const { data: products, error } = await supabase
+    .from("products")
+    .select(`
               *,
               categories:category_id (*),
               variants:variants!product_id (*)

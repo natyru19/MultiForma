@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/server";
 
 export async function DELETE(req: Request) {
     try {
         const { cart_id } = await req.json();
+        
+        const supabase = await createClient();
 
         if (!cart_id) {
         return NextResponse.json(

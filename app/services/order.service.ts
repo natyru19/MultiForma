@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabase";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 
 type CartItem = {
     product_id: string;
@@ -27,7 +27,7 @@ export const orderService = {
         paymentId,
     }: CreateOrderParams) {
 
-        const { data: existingOrder } = await supabase
+        const { data: existingOrder } = await supabaseAdmin
             .from("orders")
             .select("id")
             .eq("payment_id", String(paymentId))
@@ -43,7 +43,7 @@ export const orderService = {
             0
         );
 
-        const { data: order, error: orderError } = await supabase
+        const { data: order, error: orderError } = await supabaseAdmin
             .from("orders")
             .insert({
                 name: form.name,
@@ -63,7 +63,7 @@ export const orderService = {
                 
                 console.log("La orden ya existe para este payment_id"); 
                 
-                const { data: existingOrder } = await supabase 
+                const { data: existingOrder } = await supabaseAdmin 
                     .from("orders") 
                     .select("*") 
                     .eq("payment_id", String(paymentId)) 
@@ -84,7 +84,7 @@ export const orderService = {
             price: item.price,
         }));
 
-        const { error: itemsError } = await supabase
+        const { error: itemsError } = await supabaseAdmin
             .from("order_items")
             .insert(orderItems);
 

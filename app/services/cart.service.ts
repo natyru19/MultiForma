@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from "@/lib/supabase/admin";
 
 export const cartService = {
     async addToCart({
@@ -14,11 +14,11 @@ export const cartService = {
         quantity: number;
         price: number;
     }) {
-
+        
         let currentCartId = cart_id;
 
         if (!currentCartId) {
-        const { data: newCart, error } = await supabase
+        const { data: newCart, error } = await supabaseAdmin
             .from('carts')
             .insert({})
             .select()
@@ -29,7 +29,7 @@ export const cartService = {
         currentCartId = newCart.id;
         }
 
-        const { data: existingItem } = await supabase
+        const { data: existingItem } = await supabaseAdmin
         .from('cart_items')
         .select('*')
         .eq('cart_id', currentCartId)
@@ -38,14 +38,14 @@ export const cartService = {
         .maybeSingle();
 
         if (existingItem) {
-        await supabase
+        await supabaseAdmin
             .from('cart_items')
             .update({
             quantity: existingItem.quantity + quantity,
             })
             .eq('id', existingItem.id);
         } else {
-        await supabase
+        await supabaseAdmin
             .from('cart_items')
             .insert({
             cart_id: currentCartId,
@@ -56,7 +56,7 @@ export const cartService = {
             });
         }
 
-        const { data: cart } = await supabase
+        const { data: cart } = await supabaseAdmin
         .from('cart_items')
         .select(`
             *,
@@ -72,14 +72,16 @@ export const cartService = {
     },
 
     async updateQuantity(cart_item_id: string, quantity: number) {
-        await supabase
+
+        await supabaseAdmin
             .from("cart_items")
             .update({ quantity })
             .eq("id", cart_item_id);
     },
 
     async removeItem(cart_item_id: string) {
-        await supabase
+
+        await supabaseAdmin
             .from("cart_items")
             .delete()
             .eq("id", cart_item_id);

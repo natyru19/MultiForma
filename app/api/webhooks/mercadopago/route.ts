@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { orderService } from "@/app/services/order.service";
-import { supabase } from "@/lib/supabase";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 
 export async function POST(req: Request) {
 
@@ -64,7 +64,7 @@ export async function POST(req: Request) {
             });
         }
 
-        const { data: cartItems, error: cartError } = await supabase
+        const { data: cartItems, error: cartError } = await supabaseAdmin
             .from("cart_items")
             .select("*")
             .eq("cart_id", cartId);
@@ -85,7 +85,7 @@ export async function POST(req: Request) {
             });
         }
 
-        const { data: existingOrder, error: existingOrderError } = await supabase
+        const { data: existingOrder, error: existingOrderError } = await supabaseAdmin
             .from("orders")
             .select("*")
             .eq("payment_id", paymentId)
@@ -109,7 +109,7 @@ export async function POST(req: Request) {
             paymentId,
         });
 
-        const { error: deleteItemsError } = await supabase
+        const { error: deleteItemsError } = await supabaseAdmin
             .from("cart_items")
             .delete()
             .eq("cart_id", cartId);
@@ -124,7 +124,7 @@ export async function POST(req: Request) {
             throw deleteItemsError;
         }
 
-        const { error: deleteCartError } = await supabase
+        const { error: deleteCartError } = await supabaseAdmin
             .from("carts")
             .delete()
             .eq("id", cartId);

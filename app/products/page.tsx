@@ -1,7 +1,9 @@
 import ProductCard from "@/components/ProductCard";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/server";
 
 export default async function ProductsPage() {
+
+    const supabase = await createClient();
     
     const { data: products, error } = await supabase
         .from("products")

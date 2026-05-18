@@ -1,7 +1,7 @@
 "use client";
 
 import { use, useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/client";
 import VariantSelector from "@/components/VariantSelector";
 import AddToCartButton from "@/components/AddToCartButton";
 import BuyNowButton from "@/components/BuyNowButton";
@@ -20,11 +20,14 @@ export default function ProductDetail({
 
     useEffect(() => {
         const fetchProduct = async () => {
+
+        const supabase = createClient();
+
         const { data, error } = await supabase
             .from("products")
             .select(`
-            *,
-            variants:variants!product_id (*)
+                *,
+                variants:variants!product_id (*)
             `)
             .eq("id", id)
             .single();

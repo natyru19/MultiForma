@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 
 export default async function CategoryDetail({
@@ -7,6 +7,8 @@ export default async function CategoryDetail({
     params: Promise<{ id: string }>;
     }) {
     const { id } = await params;
+
+    const supabase = await createClient();
 
     const { data: products, error } = await supabase
         .from("products")
