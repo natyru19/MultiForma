@@ -23,6 +23,8 @@ Ecommerce de diseños personalizados e impresión 3D.
 - Guardado de información del cliente
 - Autenticación de usuarios con Supabase Auth
 - Registro e inicio de sesión
+- Asociación de órdenes con usuarios autenticados
+- Persistencia de sesión con cookies mediante Supabase Auth
 
 ### 🛍️ Frontend
 - Navegación por catálogo

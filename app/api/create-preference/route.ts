@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
     const body = await req.json();
-    const { items, cartId, form } = body;
+    const { items, cartId, form, userId } = body;
 
     const response = await fetch("https://api.mercadopago.com/checkout/preferences", {
         method: "POST",
@@ -21,6 +21,7 @@ export async function POST(req: Request) {
             metadata: {
                 cart_id: cartId,
                 customer: form,
+                user_id: userId,
             },
 
             /*

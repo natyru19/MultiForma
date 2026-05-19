@@ -2,8 +2,11 @@
 
 import { useCart } from "@/app/context/CartContext";
 import { useState } from "react";
+import { createClient } from "@/lib/supabase/client";
 
 export default function CheckoutPage() {
+
+    const supabase = createClient();
 
     const { cart } = useCart();
 
@@ -27,6 +30,11 @@ export default function CheckoutPage() {
     };
 
     const handleCheckout = async () => {
+
+        const { data: { user } } = await supabase.auth.getUser();
+
+        console.log(user);
+
         const cartId = localStorage.getItem("cart_id");
 
         try {
@@ -44,6 +52,7 @@ export default function CheckoutPage() {
 
                     cartId,
                     form,
+                    userId: user?.id,
                 }),
             });
 

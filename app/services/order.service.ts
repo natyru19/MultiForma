@@ -18,6 +18,7 @@ type CreateOrderParams = {
     cart: CartItem[];
     form: CustomerForm;
     paymentId: string | number;
+    userId?: string;
 };
 
 export const orderService = {
@@ -25,6 +26,7 @@ export const orderService = {
         cart,
         form,
         paymentId,
+        userId,
     }: CreateOrderParams) {
 
         const { data: existingOrder } = await supabaseAdmin
@@ -52,6 +54,7 @@ export const orderService = {
                 address: form.address,
                 total,
                 payment_id: String(paymentId),
+                user_id: userId || null,
                 status: "paid",
             })
             .select()

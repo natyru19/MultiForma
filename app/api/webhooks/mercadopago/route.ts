@@ -57,6 +57,8 @@ export async function POST(req: Request) {
 
         const customer = payment.metadata?.customer;
 
+        const userId = payment.metadata?.user_id;
+
         if (!cartId || !customer) {
 
             return NextResponse.json({
@@ -106,6 +108,7 @@ export async function POST(req: Request) {
         await orderService.createOrder({
             cart: cartItems,
             form: customer,
+            userId,
             paymentId,
         });
 
