@@ -1,9 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-
 import Link from "next/link";
-
 import { useCart } from "@/app/context/CartContext";
 
 export default function SuccessPage() {

@@ -31,7 +31,9 @@ export default function CheckoutPage() {
 
     const handleCheckout = async () => {
 
-        const { data: { user } } = await supabase.auth.getUser();
+        const {
+            data: { user },
+        } = await supabase.auth.getUser();
 
         console.log(user);
 
