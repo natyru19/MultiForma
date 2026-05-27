@@ -28,6 +28,9 @@ Ecommerce de diseños personalizados e impresión 3D.
 - Historial de compras por usuario autenticado
 - Navegación dinámica según estado de sesión
 - Cierre de sesión con Supabase Auth
+- Protección de checkout para usuarios autenticados
+- Asociación automática de carrito anónimo al iniciar sesión o registrarse
+- Persistencia de carrito entre sesiones
 
 ### 🛍️ Frontend
 - Navegación por catálogo

@@ -3,35 +3,56 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
 export default function LoginPage() {
     const supabase = createClient();
 
     const router = useRouter();
+    const searchParams = useSearchParams();
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
     const [loading, setLoading] = useState(false);
 
+    const redirectTo = searchParams.get("redirect") || "/";
+
     async function handleLogin(e: any) {
         e.preventDefault();
 
         setLoading(true);
 
-        const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password,
         });
 
         setLoading(false);
 
         if (error) {
-        alert(error.message);
-        return;
+            alert(error.message);
+            return;
         }
 
-        router.push("/");
+        const cartId = localStorage.getItem("cart_id");
+
+        if (cartId && data.user) {
+
+            await fetch("/api/cart/associate", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+
+                body: JSON.stringify({
+                    cartId,
+                    userId: data.user.id,
+                }),
+            });
+        }
+
+        router.push(redirectTo);
         router.refresh();
     }
 

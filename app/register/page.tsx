@@ -19,7 +19,7 @@ export default function RegisterPage() {
 
         setLoading(true);
 
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
         email,
         password,
         });
@@ -32,6 +32,23 @@ export default function RegisterPage() {
         }
 
         alert("Usuario registrado correctamente");
+
+        const cartId = localStorage.getItem("cart_id");
+
+        if (cartId && data.user) {
+
+            await fetch("/api/cart/associate", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+
+                body: JSON.stringify({
+                    cartId,
+                    userId: data.user.id,
+                }),
+            });
+        }
 
         router.push("/login");
     }
