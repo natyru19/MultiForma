@@ -19,12 +19,19 @@ export async function POST(req: Request) {
             );
         }
 
-        const { error } = await supabaseAdmin
+        console.log("ASSOCIATING CART:", {
+            cartId,
+            userId,
+        });
+
+        const { data: updatedCart, error } = await supabaseAdmin
             .from("carts")
             .update({
                 user_id: userId,
             })
-            .eq("id", cartId);
+            .eq("id", cartId)
+            .select()
+            .single();
 
         if (error) {
 
@@ -39,6 +46,8 @@ export async function POST(req: Request) {
                 }
             );
         }
+
+        console.log("UPDATED CART:", updatedCart);
 
         return NextResponse.json({
             message: "Carrito asociado correctamente",

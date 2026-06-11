@@ -30,7 +30,8 @@ Ecommerce de diseños personalizados e impresión 3D.
 - Cierre de sesión con Supabase Auth
 - Protección de checkout para usuarios autenticados
 - Asociación automática de carrito anónimo al iniciar sesión o registrarse
-- Persistencia de carrito entre sesiones
+- Persistencia de carrito para usuarios autenticados y anónimos
+- Asociación automática de carritos anónimos con usuarios autenticados
 
 ### 🛍️ Frontend
 - Navegación por catálogo

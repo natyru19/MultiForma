@@ -7,12 +7,14 @@ export const cartService = {
         cart_id,
         quantity,
         price,
+        user_id,
     }: {
         product_id: string;
         variant_id: string;
         cart_id?: string;
         quantity: number;
         price: number;
+        user_id?: string;
     }) {
         
         let currentCartId = cart_id;
@@ -20,7 +22,9 @@ export const cartService = {
         if (!currentCartId) {
         const { data: newCart, error } = await supabaseAdmin
             .from('carts')
-            .insert({})
+            .insert({
+                user_id,
+            })
             .select()
             .single();
 

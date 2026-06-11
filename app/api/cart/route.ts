@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { cartService } from '@/app/services/cart.service';
+import { createClient } from "@/lib/supabase/server";
 
 export async function GET() {
     return NextResponse.json({ ok: true });
@@ -8,7 +9,14 @@ export async function GET() {
 export async function POST(request: Request) {
     try {
         const body = await request.json();
+
         let { product_id, variant_id, cart_id, quantity, price } = body;
+
+        const supabase = await createClient();
+
+        const {
+            data: { user },
+        } = await supabase.auth.getUser();
 
         if(!product_id) {
             return NextResponse.json({ error: 'El dato es requerido' }, { status: 400 });
@@ -20,7 +28,15 @@ export async function POST(request: Request) {
 
         quantity = quantity || 1;
         price = price || 0;
-        const result = await cartService.addToCart({product_id, variant_id, cart_id, quantity, price});
+
+        const result = await cartService.addToCart({
+            product_id, 
+            variant_id, 
+            cart_id, 
+            quantity, 
+            price,
+            user_id: user?.id
+        });
 
         return NextResponse.json({ message: 'Success', data: result }, { status: 200 });
     } catch (error) {
