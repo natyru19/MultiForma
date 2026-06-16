@@ -32,6 +32,8 @@ Ecommerce de diseños personalizados e impresión 3D.
 - Asociación automática de carrito anónimo al iniciar sesión o registrarse
 - Persistencia de carrito para usuarios autenticados y anónimos
 - Asociación automática de carritos anónimos con usuarios autenticados
+- Redirección automática post-pago mediante Mercado Pago
+- Despliegue en producción mediante Vercel
 
 ### 🛍️ Frontend
 - Navegación por catálogo
@@ -48,9 +50,19 @@ Ecommerce de diseños personalizados e impresión 3D.
 - TypeScript
 - Tailwind CSS
 - PostgreSQL (Supabase)
+- Supabase Auth
 - API de Mercado Pago
 - Webhooks de Mercado Pago
-- ngrok
+- ngrok (desarrollo local)
+- Vercel
+
+---
+
+## 🌐 Demo
+
+Aplicación desplegada en:
+
+https://multiforma-ecommerce.vercel.app
 
 ---
 
@@ -85,3 +97,5 @@ Estas variables permiten conectar la aplicación con Supabase y Mercado Pago.
 ```
 
 Durante el desarrollo local se utiliza ngrok para exponer el servidor y permitir que Mercado Pago envíe las notificaciones correctamente.
+
+En producción, los webhooks son recibidos mediante la URL desplegada en Vercel.

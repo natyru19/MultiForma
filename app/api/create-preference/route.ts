@@ -16,7 +16,8 @@ export async function POST(req: Request) {
                 currency_id: "UYU",
             })),
 
-            notification_url: "https://squeak-sneeze-unviable.ngrok-free.dev/api/webhooks/mercadopago",
+            //notification_url: "https://squeak-sneeze-unviable.ngrok-free.dev/api/webhooks/mercadopago",
+            notification_url: "https://multiforma-ecommerce.vercel.app/api/webhooks/mercadopago",
 
             metadata: {
                 cart_id: cartId,
@@ -24,15 +25,15 @@ export async function POST(req: Request) {
                 user_id: userId,
             },
 
-            /*
+            
             back_urls: {
-                success: "http://localhost:3000/success",
-                failure: "http://localhost:3000/failure",
-                pending: "http://localhost:3000/pending",
+                success: "https://multiforma-ecommerce.vercel.app/success",
+                failure: "https://multiforma-ecommerce.vercel.app",
+                pending: "https://multiforma-ecommerce.vercel.app",
             },
-            */
+            
 
-            //auto_return: "approved",
+            auto_return: "approved",
         }),
     });
 
