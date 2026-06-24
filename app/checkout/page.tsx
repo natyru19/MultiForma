@@ -4,6 +4,7 @@ import { useCart } from "@/app/context/CartContext";
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
+import BackLink from "@/components/BackLink";
 
 export default function CheckoutPage() {
 
@@ -25,6 +26,8 @@ export default function CheckoutPage() {
         phone: "",
         address: "",
     });
+    const [checkoutError, setCheckoutError] = useState("");
+    const [paying, setPaying] = useState(false);
 
     useEffect(() => {
 
@@ -57,6 +60,9 @@ export default function CheckoutPage() {
 
         const cartId = localStorage.getItem("cart_id");
 
+        setCheckoutError("");
+        setPaying(true);
+
         try {
 
             const res = await fetch("/api/create-preference", {
@@ -80,18 +86,27 @@ export default function CheckoutPage() {
 
             const data = await res.json();
 
+            if (!res.ok) {
+                setCheckoutError(data.error || "No se pudo iniciar el pago");
+                return;
+            }
+
             if (data.init_point) {
 
                 window.location.href = data.init_point;
 
             } else {
 
+                setCheckoutError("Error al conectar con Mercado Pago");
                 console.error("Mercado Pago error:", data);
             }
 
         } catch (error) {
 
             console.error(error);
+            setCheckoutError("Error al procesar el pago");
+        } finally {
+            setPaying(false);
         }
     };
 
@@ -105,6 +120,8 @@ export default function CheckoutPage() {
         return (
 
             <div className="p-6 max-w-2xl mx-auto text-center">
+
+                <BackLink href="/cart" label="Volver al carrito" className="mb-6" />
 
                 <h1 className="text-2xl font-bold mb-4">
                     Debes iniciar sesión para comprar
@@ -139,6 +156,8 @@ export default function CheckoutPage() {
     return (
 
         <div className="p-6 max-w-4xl mx-auto">
+
+            <BackLink href="/cart" label="Volver al carrito" className="mb-6" />
 
             <h1 className="text-2xl font-bold mb-6">
                 Checkout
@@ -215,10 +234,20 @@ export default function CheckoutPage() {
 
             <button
                 onClick={handleCheckout}
-                className="mt-6 bg-green-600 text-white px-6 py-3 rounded-lg"
+                disabled={paying || cart.length === 0}
+                className="mt-6 bg-green-600 text-white px-6 py-3 rounded-lg disabled:opacity-50"
             >
-                Pagar con MercadoPago
+                {paying ? "Redirigiendo..." : "Pagar con MercadoPago"}
             </button>
+
+            {checkoutError && (
+                <div
+                    role="alert"
+                    className="mt-4 rounded-md border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800"
+                >
+                    {checkoutError}
+                </div>
+            )}
 
         </div>
     );

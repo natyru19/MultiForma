@@ -17,8 +17,13 @@ type CartItem = {
 
 type CartContextType = {
     cart: CartItem[];
-    addToCart: (productId: string, variantId: string, price: number) => Promise<void>;
-    updateItemQuantity: (cart_item_id: string, quantity: number) => Promise<void>;
+    addToCart: (
+        productId: string,
+        variantId: string,
+        price: number,
+        quantity?: number
+    ) => Promise<boolean>;
+    updateItemQuantity: (cart_item_id: string, quantity: number) => Promise<boolean>;
     removeItem: (cart_item_id: string) => Promise<void>;
     clearCart: () => Promise<void>;
 };
@@ -39,7 +44,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         localStorage.setItem("cart", JSON.stringify(cart));
     }, [cart]);
 
-    const addToCart = async (productId: string, variantId: string, price: number) => {
+    const addToCart = async (
+        productId: string,
+        variantId: string,
+        price: number,
+        quantity = 1
+    ): Promise<boolean> => {
         try {
         const storedCartId = localStorage.getItem("cart_id");
 
@@ -52,17 +62,19 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
             product_id: productId,
             variant_id: variantId,
             price,
+            quantity,
             cart_id: storedCartId,
             }),
         });
 
         const data = await response.json();
 
+        if (!response.ok) {
+            alert(data.error || "No se pudo agregar al carrito");
+            return false;
+        }
+
         const items = data.data.items;
-
-        console.log("DATA CART:", data);
-
-        console.log("ITEMS:", items);
 
         const formattedCart = items.map((item: any) => ({
             id: item.products?.id,
@@ -82,19 +94,31 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         const cartId = data.data.cart_id;
         localStorage.setItem("cart_id", cartId);
 
-        console.log("Respuesta del backend:", data);
+        return true;
         } catch (error) {
         console.error("Error al agregar al carrito:", error);
+        alert("Error al agregar al carrito");
+        return false;
         }
     };
 
-    const updateItemQuantity = async (cart_item_id: string, quantity: number) => {
+    const updateItemQuantity = async (
+        cart_item_id: string,
+        quantity: number
+    ): Promise<boolean> => {
         try {
-            await fetch("/api/cart", {
+            const response = await fetch("/api/cart", {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ cart_item_id, quantity }),
             });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                alert(data.error || "No se pudo actualizar la cantidad");
+                return false;
+            }
 
             setCart((prev) =>
                 prev
@@ -106,8 +130,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
                     .filter((item) => item.quantity > 0)
             );
 
+            return true;
         } catch (error) {
             console.error(error);
+            return false;
         }
     };
 

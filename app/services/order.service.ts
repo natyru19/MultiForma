@@ -1,4 +1,5 @@
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import { stockService } from "@/app/services/stock.service";
 
 type CartItem = {
     product_id: string;
@@ -28,7 +29,6 @@ export const orderService = {
         paymentId,
         userId,
     }: CreateOrderParams) {
-
         const { data: existingOrder } = await supabaseAdmin
             .from("orders")
             .select("id")
@@ -40,63 +40,81 @@ export const orderService = {
             return existingOrder;
         }
 
+        await stockService.validateCartStock(cart);
+        await stockService.deductForCartItems(cart);
+
         const total = cart.reduce(
             (acc, item) => acc + item.price * item.quantity,
             0
         );
 
-        const { data: order, error: orderError } = await supabaseAdmin
-            .from("orders")
-            .insert({
-                name: form.name,
-                email: form.email,
-                phone: form.phone,
-                address: form.address,
-                total,
-                payment_id: String(paymentId),
-                user_id: userId || null,
-                status: "paid",
-            })
-            .select()
-            .single();
+        let order: { id: string } | null = null;
 
-        if (orderError) {
+        try {
+            const { data: createdOrder, error: orderError } = await supabaseAdmin
+                .from("orders")
+                .insert({
+                    name: form.name,
+                    email: form.email,
+                    phone: form.phone,
+                    address: form.address,
+                    total,
+                    payment_id: String(paymentId),
+                    user_id: userId || null,
+                    status: "paid",
+                })
+                .select()
+                .single();
 
-            if (orderError.code === "23505") { 
-                
-                console.log("La orden ya existe para este payment_id"); 
-                
-                const { data: existingOrder } = await supabaseAdmin 
-                    .from("orders") 
-                    .select("*") 
-                    .eq("payment_id", String(paymentId)) 
-                    .single(); 
-                    
-                return existingOrder;
+            if (orderError) {
+                if (orderError.code === "23505") {
+                    console.log("La orden ya existe para este payment_id");
+
+                    const { data: duplicateOrder } = await supabaseAdmin
+                        .from("orders")
+                        .select("*")
+                        .eq("payment_id", String(paymentId))
+                        .single();
+
+                    return duplicateOrder;
+                }
+
+                console.error("ERROR CREANDO ORDER:", orderError);
+                throw orderError;
             }
 
-            console.error("ERROR CREANDO ORDER:", orderError);
-            throw orderError;
+            order = createdOrder;
+
+            const orderItems = cart.map((item) => ({
+                order_id: order!.id,
+                product_id: item.product_id,
+                variant_id: item.variant_id || null,
+                quantity: item.quantity,
+                price: item.price,
+            }));
+
+            const { error: itemsError } = await supabaseAdmin
+                .from("order_items")
+                .insert(orderItems);
+
+            if (itemsError) {
+                console.error("ERROR CREANDO ORDER ITEMS:", itemsError);
+                throw itemsError;
+            }
+        } catch (error) {
+            for (const item of cart) {
+                if (item.variant_id) {
+                    await stockService.restoreStock(
+                        item.variant_id,
+                        item.quantity
+                    );
+                }
+            }
+
+            throw error;
         }
 
-        const orderItems = cart.map((item) => ({
-            order_id: order.id,
-            product_id: item.product_id,
-            variant_id: item.variant_id || null,
-            quantity: item.quantity,
-            price: item.price,
-        }));
-
-        const { error: itemsError } = await supabaseAdmin
-            .from("order_items")
-            .insert(orderItems);
-
-        if (itemsError) {
-            console.error("ERROR CREANDO ORDER ITEMS:", itemsError);
-            throw itemsError;
-        }
-
-        console.log("ORDEN CREADA:", order.id);
+        console.log("ORDEN CREADA:", order!.id);
 
         return order;
     },

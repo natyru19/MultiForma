@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server';
-import { cartService } from '@/app/services/cart.service';
+import { NextResponse } from "next/server";
+import { cartService, StockError } from "@/app/services/cart.service";
 import { createClient } from "@/lib/supabase/server";
 
 export async function GET() {
@@ -18,30 +18,46 @@ export async function POST(request: Request) {
             data: { user },
         } = await supabase.auth.getUser();
 
-        if(!product_id) {
-            return NextResponse.json({ error: 'El dato es requerido' }, { status: 400 });
+        if (!product_id) {
+            return NextResponse.json(
+                { error: "El producto es requerido" },
+                { status: 400 }
+            );
         }
 
         if (!variant_id) {
-            return NextResponse.json({ error: "Debe seleccionar una variante" }, { status: 400 });
-        }   
+            return NextResponse.json(
+                { error: "Debe seleccionar una variante" },
+                { status: 400 }
+            );
+        }
 
         quantity = quantity || 1;
         price = price || 0;
 
         const result = await cartService.addToCart({
-            product_id, 
-            variant_id, 
-            cart_id, 
-            quantity, 
+            product_id,
+            variant_id,
+            cart_id,
+            quantity,
             price,
-            user_id: user?.id
+            user_id: user?.id,
         });
 
-        return NextResponse.json({ message: 'Success', data: result }, { status: 200 });
+        return NextResponse.json(
+            { message: "Success", data: result },
+            { status: 200 }
+        );
     } catch (error) {
-        console.error('Error al agregar al carrito:', error);
-        return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });
+        if (error instanceof StockError) {
+            return NextResponse.json({ error: error.message }, { status: 400 });
+        }
+
+        console.error("Error al agregar al carrito:", error);
+        return NextResponse.json(
+            { error: "Error interno del servidor" },
+            { status: 500 }
+        );
     }
 }
 
@@ -51,7 +67,10 @@ export async function PATCH(request: Request) {
         const { cart_item_id, quantity } = body;
 
         if (!cart_item_id) {
-            return Response.json({ error: "cart_item_id requerido" }, { status: 400 });
+            return Response.json(
+                { error: "cart_item_id requerido" },
+                { status: 400 }
+            );
         }
 
         if (quantity < 1) {
@@ -62,8 +81,15 @@ export async function PATCH(request: Request) {
 
         return Response.json({ message: "Cantidad actualizada" });
     } catch (error) {
-        console.error('Error al modificar el carrito:', error);
-        return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });        
+        if (error instanceof StockError) {
+            return NextResponse.json({ error: error.message }, { status: 400 });
+        }
+
+        console.error("Error al modificar el carrito:", error);
+        return NextResponse.json(
+            { error: "Error interno del servidor" },
+            { status: 500 }
+        );
     }
 }
 
@@ -73,13 +99,15 @@ export async function DELETE(request: Request) {
         const { cart_item_id } = body;
 
         if (!cart_item_id) {
-            return Response.json({ error: "cart_item_id requerido" }, { status: 400 });
+            return Response.json(
+                { error: "cart_item_id requerido" },
+                { status: 400 }
+            );
         }
 
         await cartService.removeItem(cart_item_id);
 
         return Response.json({ message: "Item eliminado" });
-
     } catch (error) {
         console.error(error);
         return Response.json({ error: "Error interno" }, { status: 500 });

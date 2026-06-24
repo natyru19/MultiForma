@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
+import BackLink from "@/components/BackLink";
 
 export default async function CategoryDetail({
     params,
@@ -20,11 +21,18 @@ export default async function CategoryDetail({
     }
 
     if (!products || products.length === 0) {
-        return <p className="p-6">No hay productos en esta categoría</p>;
+        return (
+            <div className="p-6 max-w-6xl mx-auto">
+                <BackLink href="/categories" label="Categorías" />
+                <p>No hay productos en esta categoría</p>
+            </div>
+        );
     }
 
     return (
-        <div className="p-6">
+        <div className="p-6 max-w-6xl mx-auto">
+        <BackLink href="/categories" label="Categorías" />
+
         <h1 className="text-2xl font-bold mb-6 capitalize">{id}</h1>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

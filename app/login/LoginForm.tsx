@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter, useSearchParams } from "next/navigation";
+import BackLink from "@/components/BackLink";
+import Link from "next/link";
 
 export default function LoginForm() {
     const supabase = createClient();
@@ -16,6 +18,8 @@ export default function LoginForm() {
     const [loading, setLoading] = useState(false);
 
     const redirectTo = searchParams.get("redirect") || "/";
+    const backHref = redirectTo !== "/" ? redirectTo : "/";
+    const backLabel = redirectTo !== "/" ? "Volver" : "Inicio";
 
     async function handleLogin(e: any) {
         e.preventDefault();
@@ -57,6 +61,8 @@ export default function LoginForm() {
 
     return (
         <main className="max-w-md mx-auto p-6">
+            <BackLink href={backHref} label={backLabel} className="mb-6" />
+
             <h1 className="text-3xl font-bold mb-6">
                 Iniciar sesión
             </h1>
@@ -89,6 +95,16 @@ export default function LoginForm() {
                 {loading ? "Ingresando..." : "Ingresar"}
                 </button>
             </form>
+
+            <p className="mt-6 text-sm text-gray-500 text-center">
+                ¿No tenés cuenta?{" "}
+                <Link
+                    href={`/register${redirectTo !== "/" ? `?redirect=${encodeURIComponent(redirectTo)}` : ""}`}
+                    className="underline"
+                >
+                    Crear cuenta
+                </Link>
+            </p>
         </main>
     );
 }

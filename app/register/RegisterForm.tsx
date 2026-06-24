@@ -2,12 +2,17 @@
 
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import BackLink from "@/components/BackLink";
+import Link from "next/link";
 
 export default function RegisterForm() {
     const supabase = createClient();
 
     const router = useRouter();
+    const searchParams = useSearchParams();
+
+    const redirectTo = searchParams.get("redirect") || "/login";
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -50,11 +55,25 @@ export default function RegisterForm() {
             });
         }
 
-        router.push("/login");
+        router.push(
+            redirectTo.startsWith("/login")
+                ? redirectTo
+                : `/login?redirect=${encodeURIComponent(redirectTo)}`
+        );
     }
 
     return (
         <main className="max-w-md mx-auto p-6">
+            <BackLink
+                href={
+                    redirectTo.startsWith("/login")
+                        ? redirectTo
+                        : `/login?redirect=${encodeURIComponent(redirectTo)}`
+                }
+                label="Iniciar sesión"
+                className="mb-6"
+            />
+
             <h1 className="text-3xl font-bold mb-6">
                 Crear cuenta
             </h1>
@@ -87,6 +106,20 @@ export default function RegisterForm() {
                 {loading ? "Creando cuenta..." : "Registrarse"}
                 </button>
             </form>
+
+            <p className="mt-6 text-sm text-gray-500 text-center">
+                ¿Ya tenés cuenta?{" "}
+                <Link
+                    href={
+                        redirectTo.startsWith("/login")
+                            ? redirectTo
+                            : `/login?redirect=${encodeURIComponent(redirectTo)}`
+                    }
+                    className="underline"
+                >
+                    Iniciar sesión
+                </Link>
+            </p>
         </main>
     );
 }

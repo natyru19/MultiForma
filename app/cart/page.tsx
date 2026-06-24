@@ -2,6 +2,7 @@
 
 import { useCart } from "@/app/context/CartContext";
 import { useRouter } from "next/navigation";
+import BackLink from "@/components/BackLink";
 
 export default function CartPage() {
     const { cart, updateItemQuantity, removeItem } = useCart();
@@ -13,10 +14,20 @@ export default function CartPage() {
 
     return (
         <div className="p-6 max-w-4xl mx-auto">
+        <BackLink href="/products" label="Seguir comprando" className="mb-6" />
+
         <h1 className="text-2xl font-bold mb-6">Carrito</h1>
 
         {cart.length === 0 ? (
-            <p>El carrito está vacío</p>
+            <div className="space-y-4">
+                <p>El carrito está vacío</p>
+                <button
+                    onClick={() => router.push("/products")}
+                    className="border px-5 py-2 rounded"
+                >
+                    Ir al catálogo
+                </button>
+            </div>
         ) : (
             <div className="space-y-4">
                 {cart.map((item) => (
