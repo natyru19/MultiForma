@@ -58,6 +58,11 @@ export default function CheckoutPage() {
 
         if (!user) return;
 
+        if (!form.name.trim() || !form.email.trim()) {
+            setCheckoutError("Completá nombre y email antes de pagar");
+            return;
+        }
+
         const cartId = localStorage.getItem("cart_id");
 
         setCheckoutError("");
@@ -201,20 +206,26 @@ export default function CheckoutPage() {
                 <input
                     name="name"
                     placeholder="Nombre"
+                    value={form.name}
                     onChange={handleChange}
+                    required
                     className="w-full border p-2 rounded"
                 />
 
                 <input
                     name="email"
+                    type="email"
                     placeholder="Email"
+                    value={form.email}
                     onChange={handleChange}
+                    required
                     className="w-full border p-2 rounded"
                 />
 
                 <input
                     name="phone"
                     placeholder="Teléfono"
+                    value={form.phone}
                     onChange={handleChange}
                     className="w-full border p-2 rounded"
                 />
@@ -222,6 +233,7 @@ export default function CheckoutPage() {
                 <input
                     name="address"
                     placeholder="Dirección"
+                    value={form.address}
                     onChange={handleChange}
                     className="w-full border p-2 rounded"
                 />

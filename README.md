@@ -114,9 +114,30 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=tu_supabase_anon_key
 SUPABASE_SERVICE_ROLE_KEY=tu_service_role_key
 MP_ACCESS_TOKEN=mp_access_token 
 NEXT_PUBLIC_MP_PUBLIC_KEY=mp_public_key
+
+# URLs de la app
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+NEXT_PUBLIC_VERCEL_APP_URL=https://multiforma-ecommerce.vercel.app
+NGROK_URL=https://tu-subdominio.ngrok-free.dev
 ```
 
 Estas variables permiten conectar la aplicación con Supabase, habilitar operaciones administrativas seguras y procesar pagos con Mercado Pago.
+
+### Variables en Vercel (producción)
+
+Configurar en el panel de Vercel → Settings → Environment Variables:
+
+| Variable | Valor |
+|----------|-------|
+| `NEXT_PUBLIC_SUPABASE_URL` | URL del proyecto Supabase |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Anon key de Supabase |
+| `SUPABASE_SERVICE_ROLE_KEY` | Service role key (secreto) |
+| `MP_ACCESS_TOKEN` | Token de Mercado Pago |
+| `NEXT_PUBLIC_MP_PUBLIC_KEY` | Public key de Mercado Pago |
+| `NEXT_PUBLIC_APP_URL` | `https://multiforma-ecommerce.vercel.app` |
+| `NEXT_PUBLIC_VERCEL_APP_URL` | `https://multiforma-ecommerce.vercel.app` |
+
+No hace falta `NGROK_URL` en Vercel.
 
 ---
 
@@ -135,8 +156,13 @@ Estas variables permiten conectar la aplicación con Supabase, habilitar operaci
 - Configurar `back_urls` de Mercado Pago para redirigir correctamente luego del pago
 - Verificar el funcionamiento de los webhooks en entorno productivo
 
-Durante el desarrollo local se utiliza ngrok para exponer el servidor y permitir que Mercado Pago envíe las notificaciones correctamente.
-En producción, los webhooks son recibidos mediante la URL desplegada en Vercel.
+### Desarrollo local vs producción
+
+- **Local** (`NEXT_PUBLIC_APP_URL=http://localhost:3000`): Mercado Pago usa `NGROK_URL` para webhook y redirecciones (`notification_url` y `back_urls`).
+- **Producción** (Vercel): usa `NEXT_PUBLIC_VERCEL_APP_URL` / `NEXT_PUBLIC_APP_URL` apuntando al dominio de Vercel.
+
+Durante el desarrollo local ejecutá `ngrok http 3000` y actualizá `NGROK_URL` en `.env.local`.
+En producción, los webhooks son recibidos en `https://multiforma-ecommerce.vercel.app/api/webhooks/mercadopago`.
 
 ---
 

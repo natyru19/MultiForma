@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { stockService, StockError } from "@/app/services/stock.service";
+import { getMercadoPagoUrls } from "@/lib/appUrl";
 
 export async function POST(req: Request) {
     try {
@@ -10,6 +11,13 @@ export async function POST(req: Request) {
         if (!cartId) {
             return NextResponse.json(
                 { error: "Carrito no encontrado" },
+                { status: 400 }
+            );
+        }
+
+        if (!form?.name?.trim() || !form?.email?.trim()) {
+            return NextResponse.json(
+                { error: "Completá nombre y email antes de pagar" },
                 { status: 400 }
             );
         }
@@ -28,6 +36,21 @@ export async function POST(req: Request) {
 
         await stockService.validateCartStock(cartItems);
 
+        let mpUrls;
+
+        try {
+            mpUrls = getMercadoPagoUrls();
+        } catch (urlError) {
+            const message =
+                urlError instanceof Error
+                    ? urlError.message
+                    : "Error de configuración de URLs";
+
+            return NextResponse.json({ error: message }, { status: 500 });
+        }
+
+        console.log("MP URLS:", mpUrls.mode, mpUrls.baseUrl);
+
         const response = await fetch(
             "https://api.mercadopago.com/checkout/preferences",
             {
@@ -37,28 +60,31 @@ export async function POST(req: Request) {
                     Authorization: `Bearer ${process.env.MP_ACCESS_TOKEN}`,
                 },
                 body: JSON.stringify({
-                    items: items.map((item: { title: string; quantity: number; unit_price: number }) => ({
-                        ...item,
-                        currency_id: "UYU",
-                    })),
+                    items: items.map(
+                        (item: {
+                            title: string;
+                            quantity: number;
+                            unit_price: number;
+                        }) => ({
+                            ...item,
+                            currency_id: "UYU",
+                        })
+                    ),
 
-                    //notification_url: "https://squeak-sneeze-unviable.ngrok-free.dev/api/webhooks/mercadopago",
-                    notification_url:
-                        "https://multiforma-ecommerce.vercel.app/api/webhooks/mercadopago",
+                    external_reference: String(cartId),
+
+                    notification_url: mpUrls.notification_url,
 
                     metadata: {
-                        cart_id: cartId,
-                        customer: form,
-                        user_id: userId,
+                        cart_id: String(cartId),
+                        user_id: String(userId || ""),
+                        customer_name: String(form.name || ""),
+                        customer_email: String(form.email || ""),
+                        customer_phone: String(form.phone || ""),
+                        customer_address: String(form.address || ""),
                     },
 
-                    back_urls: {
-                        success:
-                            "https://multiforma-ecommerce.vercel.app/success",
-                            //"https://squeak-sneeze-unviable.ngrok-free.dev/success",
-                        failure: "https://multiforma-ecommerce.vercel.app",
-                        pending: "https://multiforma-ecommerce.vercel.app",
-                    },
+                    back_urls: mpUrls.back_urls,
 
                     auto_return: "approved",
                 }),
@@ -68,6 +94,14 @@ export async function POST(req: Request) {
         const data = await response.json();
 
         console.log("MP RESPONSE:", data);
+
+        if (!response.ok) {
+            console.error("MP ERROR:", data);
+            return NextResponse.json(
+                { error: data.message || "Error al crear preferencia de pago" },
+                { status: response.status }
+            );
+        }
 
         return NextResponse.json(data);
     } catch (error) {
