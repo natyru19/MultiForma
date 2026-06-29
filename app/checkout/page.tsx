@@ -149,7 +149,7 @@ export default function CheckoutPage() {
                         href="/register?redirect=/checkout"
                         className="border px-6 py-3 rounded-lg"
                     >
-                        Crear cuenta
+                        Registrarse
                     </Link>
 
                 </div>

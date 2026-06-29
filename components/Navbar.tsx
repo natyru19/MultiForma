@@ -32,7 +32,7 @@ export default async function Navbar() {
                 ) : (
                     <>
                         <Link href="/login">
-                            Login
+                            Iniciar sesión
                         </Link>
 
                         <Link href="/register">

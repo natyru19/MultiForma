@@ -102,7 +102,7 @@ export default function LoginForm() {
                     href={`/register${redirectTo !== "/" ? `?redirect=${encodeURIComponent(redirectTo)}` : ""}`}
                     className="underline"
                 >
-                    Crear cuenta
+                    Registrarse
                 </Link>
             </p>
         </main>
