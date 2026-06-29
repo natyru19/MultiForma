@@ -158,11 +158,21 @@ No hace falta `NGROK_URL` en Vercel.
 
 ### Desarrollo local vs producción
 
-- **Local** (`NEXT_PUBLIC_APP_URL=http://localhost:3000`): Mercado Pago usa `NGROK_URL` para webhook y redirecciones (`notification_url` y `back_urls`).
-- **Producción** (Vercel): usa `NEXT_PUBLIC_VERCEL_APP_URL` / `NEXT_PUBLIC_APP_URL` apuntando al dominio de Vercel.
+- **Local** (`NEXT_PUBLIC_APP_URL=http://localhost:3000`):
+  - `NGROK_URL` → solo para el **webhook** (`notification_url`)
+  - `back_urls` → **localhost** (el navegador vuelve a tu app local tras pagar)
+- **Producción** (Vercel): todo apunta a `NEXT_PUBLIC_VERCEL_APP_URL`
 
-Durante el desarrollo local ejecutá `ngrok http 3000` y actualizá `NGROK_URL` en `.env.local`.
-En producción, los webhooks son recibidos en `https://multiforma-ecommerce.vercel.app/api/webhooks/mercadopago`.
+**Probar pagos en local:**
+1. `npm run dev`
+2. `ngrok http 3000` → copiar URL en `NGROK_URL` del `.env.local`
+3. Reiniciar `npm run dev`
+4. **Navegá la tienda por la URL de ngrok** (no localhost) — MP redirige ahí después del pago
+5. Completá la compra con tarjeta de prueba de Mercado Pago
+6. Si no redirige: en `/cart` o `/checkout` usá **"Ya pagué — confirmar compra"**
+
+Durante el desarrollo local ejecutá ngrok en paralelo al servidor.
+En producción, el webhook llega a `https://multiforma-ecommerce.vercel.app/api/webhooks/mercadopago`.
 
 ---
 

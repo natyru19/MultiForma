@@ -103,7 +103,16 @@ export async function POST(req: Request) {
             );
         }
 
-        return NextResponse.json(data);
+        const checkoutUrl =
+            mpUrls.mode === "local" && data.sandbox_init_point
+                ? data.sandbox_init_point
+                : data.init_point;
+
+        return NextResponse.json({
+            ...data,
+            checkout_url: checkoutUrl,
+            mp_mode: mpUrls.mode,
+        });
     } catch (error) {
         if (error instanceof StockError) {
             return NextResponse.json({ error: error.message }, { status: 400 });

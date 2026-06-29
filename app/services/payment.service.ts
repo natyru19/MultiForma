@@ -9,7 +9,7 @@ type CustomerForm = {
 };
 
 type ProcessPaymentResult =
-    | { ok: true; orderId: string; message: string }
+    | { ok: true; orderId?: string; message: string; pending?: boolean }
     | { ok: false; message: string; status?: number };
 
 function parseCustomerFromPayment(payment: Record<string, unknown>): CustomerForm | null {
@@ -104,6 +104,15 @@ export async function processApprovedPayment(
     console.log("PROCESS PAYMENT:", paymentId, payment.status, payment.metadata);
 
     if (payment.status !== "approved") {
+        const pendingStatuses = ["pending", "in_process", "in_mediation", "authorized"];
+        if (pendingStatuses.includes(payment.status)) {
+            return {
+                ok: true,
+                pending: true,
+                message: `Pago en estado ${payment.status}; se procesará al aprobarse`,
+            };
+        }
+
         return {
             ok: false,
             message: `Pago no aprobado (${payment.status})`,
@@ -223,4 +232,87 @@ export function extractPaymentIdFromWebhook(
     }
 
     return String(raw);
+}
+
+export async function processMerchantOrder(
+    merchantOrderId: string
+): Promise<ProcessPaymentResult> {
+    const response = await fetch(
+        `https://api.mercadopago.com/merchant_orders/${merchantOrderId}`,
+        {
+            headers: {
+                Authorization: `Bearer ${process.env.MP_ACCESS_TOKEN}`,
+            },
+            cache: "no-store",
+        }
+    );
+
+    if (!response.ok) {
+        console.error("ERROR MP MERCHANT ORDER:", merchantOrderId, await response.text());
+        return {
+            ok: false,
+            message: "No se pudo obtener la orden de Mercado Pago",
+            status: 502,
+        };
+    }
+
+    const merchantOrder = await response.json();
+    const payments = (merchantOrder.payments ?? []) as Array<{
+        id: number | string;
+        status: string;
+    }>;
+
+    const approvedPayment = payments.find((p) => p.status === "approved");
+
+    if (!approvedPayment) {
+        return {
+            ok: true,
+            pending: true,
+            message: "Pago pendiente; se procesará cuando Mercado Pago lo apruebe",
+        };
+    }
+
+    return processApprovedPayment(String(approvedPayment.id));
+}
+
+export async function confirmPendingByCartId(
+    cartId: string
+): Promise<ProcessPaymentResult> {
+    const response = await fetch(
+        `https://api.mercadopago.com/v1/payments/search?external_reference=${encodeURIComponent(cartId)}&sort=date_created&criteria=desc`,
+        {
+            headers: {
+                Authorization: `Bearer ${process.env.MP_ACCESS_TOKEN}`,
+            },
+            cache: "no-store",
+        }
+    );
+
+    if (!response.ok) {
+        console.error("ERROR MP PAYMENT SEARCH:", await response.text());
+        return {
+            ok: false,
+            message: "No se pudo buscar el pago en Mercado Pago",
+            status: 502,
+        };
+    }
+
+    const searchData = await response.json();
+    const results = (searchData.results ?? []) as Array<{
+        id: number | string;
+        status: string;
+    }>;
+
+    const approvedPayment = results.find((p) => p.status === "approved");
+
+    if (!approvedPayment) {
+        return {
+            ok: false,
+            message:
+                "No encontramos un pago aprobado para este carrito. Si acabás de pagar, esperá unos segundos e intentá de nuevo.",
+            status: 404,
+        };
+    }
+
+    return processApprovedPayment(String(approvedPayment.id));
 }

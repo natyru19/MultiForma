@@ -3,14 +3,19 @@
 import { useCart } from "@/app/context/CartContext";
 import { useRouter } from "next/navigation";
 import BackLink from "@/components/BackLink";
+import ConfirmPendingPayment from "@/components/ConfirmPendingPayment";
 
 export default function CartPage() {
-    const { cart, updateItemQuantity, removeItem } = useCart();
+    const { cart, isReady, updateItemQuantity, removeItem } = useCart();
     const router = useRouter();
 
     const total = cart.reduce(
         (acc, item) => acc + item.price * item.quantity, 0
     );
+
+    if (!isReady) {
+        return <p className="p-6 max-w-4xl mx-auto">Cargando carrito...</p>;
+    }
 
     return (
         <div className="p-6 max-w-4xl mx-auto">
@@ -104,6 +109,10 @@ export default function CartPage() {
                 >
                     Finalizar compra
                 </button>
+
+                <div className="mt-8 border-t pt-6">
+                    <ConfirmPendingPayment />
+                </div>
             </div>
         )}
         </div>

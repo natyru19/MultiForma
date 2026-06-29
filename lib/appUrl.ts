@@ -50,6 +50,7 @@ export function getMercadoPagoUrls(): MercadoPagoUrlConfig {
             );
         }
 
+        // MP no acepta localhost en back_urls: todo pasa por ngrok en local.
         return {
             mode: "local",
             baseUrl: ngrokUrl,
@@ -57,7 +58,7 @@ export function getMercadoPagoUrls(): MercadoPagoUrlConfig {
             back_urls: {
                 success: `${ngrokUrl}/success`,
                 failure: ngrokUrl,
-                pending: ngrokUrl,
+                pending: `${ngrokUrl}/payment/pending`,
             },
         };
     }
@@ -72,7 +73,7 @@ export function getMercadoPagoUrls(): MercadoPagoUrlConfig {
         back_urls: {
             success: `${productionBase}/success`,
             failure: productionBase,
-            pending: productionBase,
+            pending: `${productionBase}/payment/pending`,
         },
     };
 }

@@ -17,6 +17,7 @@ type CartItem = {
 
 type CartContextType = {
     cart: CartItem[];
+    isReady: boolean;
     addToCart: (
         productId: string,
         variantId: string,
@@ -30,19 +31,94 @@ type CartContextType = {
 
 const CartContext = createContext<CartContextType | null>(null);
 
+function formatCartItems(items: unknown[]): CartItem[] {
+    if (!items?.length) return [];
+
+    return items.map((raw) => {
+        const item = raw as {
+            id: string;
+            product_id: string;
+            variant_id: string;
+            quantity: number;
+            price?: number;
+            products?: { id?: string; name?: string; image?: string | null };
+            variants?: {
+                price?: number | string;
+                option?: string | null;
+                color?: string | null;
+            };
+        };
+
+        return {
+            id: item.products?.id ?? item.product_id,
+            cart_item_id: item.id,
+            product_id: item.product_id,
+            variant_id: item.variant_id,
+            name: item.products?.name ?? "Producto",
+            price: Number(item.variants?.price ?? item.price ?? 0),
+            image: item.products?.image ?? "",
+            quantity: item.quantity,
+            option: item.variants?.option ?? undefined,
+            color: item.variants?.color ?? undefined,
+        };
+    });
+}
+
 export function CartProvider({ children }: { children: React.ReactNode }) {
     const [cart, setCart] = useState<CartItem[]>([]);
+    const [isReady, setIsReady] = useState(false);
 
     useEffect(() => {
-        const storedCart = localStorage.getItem("cart");
-        if (storedCart) {
-        setCart(JSON.parse(storedCart));
+        async function hydrateCart() {
+            try {
+                const storedCartId = localStorage.getItem("cart_id");
+
+                if (storedCartId) {
+                    const response = await fetch(
+                        `/api/cart?cart_id=${encodeURIComponent(storedCartId)}`
+                    );
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        const items = data.data?.items ?? [];
+
+                        if (items.length > 0) {
+                            setCart(formatCartItems(items));
+                            return;
+                        }
+
+                        localStorage.removeItem("cart_id");
+                    }
+                }
+
+                const storedCart = localStorage.getItem("cart");
+
+                if (storedCart) {
+                    const parsed = JSON.parse(storedCart) as CartItem[];
+
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        setCart(parsed);
+                    }
+                }
+            } catch (error) {
+                console.error("Error al cargar el carrito:", error);
+            } finally {
+                setIsReady(true);
+            }
         }
+
+        hydrateCart();
     }, []);
 
     useEffect(() => {
-        localStorage.setItem("cart", JSON.stringify(cart));
-    }, [cart]);
+        if (!isReady) return;
+
+        if (cart.length > 0) {
+            localStorage.setItem("cart", JSON.stringify(cart));
+        } else {
+            localStorage.removeItem("cart");
+        }
+    }, [cart, isReady]);
 
     const addToCart = async (
         productId: string,
@@ -51,54 +127,40 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         quantity = 1
     ): Promise<boolean> => {
         try {
-        const storedCartId = localStorage.getItem("cart_id");
+            const storedCartId = localStorage.getItem("cart_id");
 
-        const response = await fetch("/api/cart", {
-            method: "POST",
-            headers: {
-            "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-            product_id: productId,
-            variant_id: variantId,
-            price,
-            quantity,
-            cart_id: storedCartId,
-            }),
-        });
+            const response = await fetch("/api/cart", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    product_id: productId,
+                    variant_id: variantId,
+                    price,
+                    quantity,
+                    cart_id: storedCartId,
+                }),
+            });
 
-        const data = await response.json();
+            const data = await response.json();
 
-        if (!response.ok) {
-            alert(data.error || "No se pudo agregar al carrito");
-            return false;
-        }
+            if (!response.ok) {
+                alert(data.error || "No se pudo agregar al carrito");
+                return false;
+            }
 
-        const items = data.data.items;
+            const items = data.data?.items ?? [];
+            const formattedCart = formatCartItems(items);
 
-        const formattedCart = items.map((item: any) => ({
-            id: item.products?.id,
-            cart_item_id: item.id,
-            product_id: item.product_id,
-            variant_id: item.variant_id,
-            name: item.products?.name,
-            price: item.variants?.price,
-            image: item.products?.image,
-            quantity: item.quantity,
-            option: item.variants?.option,
-            color: item.variants?.color,
-        }));
+            setCart(formattedCart);
+            localStorage.setItem("cart_id", data.data.cart_id);
 
-        setCart(formattedCart);
-
-        const cartId = data.data.cart_id;
-        localStorage.setItem("cart_id", cartId);
-
-        return true;
+            return formattedCart.length > 0;
         } catch (error) {
-        console.error("Error al agregar al carrito:", error);
-        alert("Error al agregar al carrito");
-        return false;
+            console.error("Error al agregar al carrito:", error);
+            alert("Error al agregar al carrito");
+            return false;
         }
     };
 
@@ -148,7 +210,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
             setCart((prev) =>
                 prev.filter((item) => item.cart_item_id !== cart_item_id)
             );
-
         } catch (error) {
             console.error(error);
         }
@@ -158,40 +219,50 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         try {
             const cartId = localStorage.getItem("cart_id");
 
-            if (!cartId) return;
+            if (cartId) {
+                await fetch("/api/cart/clear", {
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ cart_id: cartId }),
+                });
 
-            await fetch("/api/cart/clear", {
-            method: "DELETE",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ cart_id: cartId }),
-            });
-
-            await fetch(`/api/cart/${cartId}`, {
-                method: "DELETE",
-            });
+                await fetch(`/api/cart/${cartId}`, {
+                    method: "DELETE",
+                });
+            }
 
             localStorage.removeItem("cart_id");
             localStorage.removeItem("cart");
             setCart([]);
-
         } catch (error) {
             console.error("Error limpiando carrito:", error);
         }
     };
 
     return (
-        <CartContext.Provider value={{ cart, addToCart, updateItemQuantity, removeItem, clearCart }}>
-        {children}
+        <CartContext.Provider
+            value={{
+                cart,
+                isReady,
+                addToCart,
+                updateItemQuantity,
+                removeItem,
+                clearCart,
+            }}
+        >
+            {children}
         </CartContext.Provider>
     );
-    }
+}
 
-    export function useCart() {
+export function useCart() {
     const context = useContext(CartContext);
+
     if (!context) {
         throw new Error("useCart debe usarse dentro de CartProvider");
     }
+
     return context;
 }

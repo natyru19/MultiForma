@@ -22,6 +22,13 @@ export async function POST(req: Request) {
             );
         }
 
+        if (result.pending) {
+            return NextResponse.json(
+                { error: result.message },
+                { status: 202 }
+            );
+        }
+
         return NextResponse.json({
             message: result.message,
             orderId: result.orderId,

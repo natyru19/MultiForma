@@ -4,6 +4,7 @@ import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import BackLink from "@/components/BackLink";
+import ConfirmPendingPayment from "@/components/ConfirmPendingPayment";
 import { useCart } from "@/app/context/CartContext";
 
 function SuccessContent() {
@@ -21,33 +22,63 @@ function SuccessContent() {
                 searchParams.get("payment_id") ||
                 searchParams.get("collection_id");
 
-            if (!paymentId || paymentId === "null") {
-                setStatus("success");
-                return;
-            }
-
             try {
-                const response = await fetch("/api/orders/confirm", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        payment_id: paymentId,
-                    }),
-                });
+                if (paymentId && paymentId !== "null") {
+                    const response = await fetch("/api/orders/confirm", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            payment_id: paymentId,
+                        }),
+                    });
 
-                const data = await response.json();
+                    const data = await response.json();
 
-                if (!response.ok) {
-                    setErrorMessage(
-                        data.error || "No se pudo confirmar la compra"
-                    );
-                    setStatus("error");
+                    if (!response.ok) {
+                        setErrorMessage(
+                            data.error || "No se pudo confirmar la compra"
+                        );
+                        setStatus("error");
+                        return;
+                    }
+
+                    localStorage.removeItem("pending_cart_id");
+                    await clearCart();
+                    setStatus("success");
                     return;
                 }
 
-                await clearCart();
+                const externalReference = searchParams.get("external_reference");
+                const pendingCartId =
+                    localStorage.getItem("pending_cart_id") ||
+                    localStorage.getItem("cart_id") ||
+                    (externalReference && externalReference !== "null"
+                        ? externalReference
+                        : null);
+
+                if (pendingCartId) {
+                    const response = await fetch("/api/orders/confirm-pending", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            cart_id: pendingCartId,
+                        }),
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        localStorage.removeItem("pending_cart_id");
+                        await clearCart();
+                        setStatus("success");
+                        return;
+                    }
+                }
+
                 setStatus("success");
             } catch {
                 setErrorMessage("Error al confirmar la compra");
@@ -77,9 +108,7 @@ function SuccessContent() {
 
                 <p className="text-red-700 mb-6">{errorMessage}</p>
 
-                <p className="text-gray-600 mb-6">
-                    Si el pago fue descontado, contactanos con tu comprobante.
-                </p>
+                <ConfirmPendingPayment className="text-left border rounded-lg p-5 bg-gray-50 mb-6" />
 
                 <Link
                     href="/orders"
@@ -124,4 +153,3 @@ export default function SuccessPage() {
         </Suspense>
     );
 }
-

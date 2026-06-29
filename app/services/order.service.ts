@@ -29,64 +29,54 @@ export const orderService = {
         paymentId,
         userId,
     }: CreateOrderParams) {
-        const { data: existingOrder } = await supabaseAdmin
-            .from("orders")
-            .select("id")
-            .eq("payment_id", String(paymentId))
-            .single();
-
-        if (existingOrder) {
-            console.log("La orden ya existe para este pago");
-            return existingOrder;
-        }
-
         await stockService.validateCartStock(cart);
-        await stockService.deductForCartItems(cart);
 
         const total = cart.reduce(
             (acc, item) => acc + item.price * item.quantity,
             0
         );
 
-        let order: { id: string } | null = null;
+        const paymentIdStr = String(paymentId);
 
-        try {
-            const { data: createdOrder, error: orderError } = await supabaseAdmin
-                .from("orders")
-                .insert({
-                    name: form.name,
-                    email: form.email,
-                    phone: form.phone,
-                    address: form.address,
-                    total,
-                    payment_id: String(paymentId),
-                    user_id: userId || null,
-                    status: "paid",
-                })
-                .select()
-                .single();
+        // Reservar la orden primero (payment_id único) para evitar doble descuento
+        // cuando el webhook y /success corren al mismo tiempo.
+        const { data: createdOrder, error: orderError } = await supabaseAdmin
+            .from("orders")
+            .insert({
+                name: form.name,
+                email: form.email,
+                phone: form.phone,
+                address: form.address,
+                total,
+                payment_id: paymentIdStr,
+                user_id: userId || null,
+                status: "paid",
+            })
+            .select()
+            .single();
 
-            if (orderError) {
-                if (orderError.code === "23505") {
-                    console.log("La orden ya existe para este payment_id");
+        if (orderError) {
+            if (orderError.code === "23505") {
+                console.log("La orden ya existe para este payment_id");
 
-                    const { data: duplicateOrder } = await supabaseAdmin
-                        .from("orders")
-                        .select("*")
-                        .eq("payment_id", String(paymentId))
-                        .single();
+                const { data: duplicateOrder } = await supabaseAdmin
+                    .from("orders")
+                    .select("*")
+                    .eq("payment_id", paymentIdStr)
+                    .single();
 
-                    return duplicateOrder;
-                }
-
-                console.error("ERROR CREANDO ORDER:", orderError);
-                throw orderError;
+                return duplicateOrder;
             }
 
-            order = createdOrder;
+            console.error("ERROR CREANDO ORDER:", orderError);
+            throw orderError;
+        }
+
+        try {
+            await stockService.deductForCartItems(cart);
 
             const orderItems = cart.map((item) => ({
-                order_id: order!.id,
+                order_id: createdOrder.id,
                 product_id: item.product_id,
                 variant_id: item.variant_id || null,
                 quantity: item.quantity,
@@ -111,11 +101,16 @@ export const orderService = {
                 }
             }
 
+            await supabaseAdmin
+                .from("orders")
+                .delete()
+                .eq("id", createdOrder.id);
+
             throw error;
         }
 
-        console.log("ORDEN CREADA:", order!.id);
+        console.log("ORDEN CREADA:", createdOrder.id);
 
-        return order;
+        return createdOrder;
     },
 };

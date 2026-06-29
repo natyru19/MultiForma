@@ -5,12 +5,13 @@ import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 import BackLink from "@/components/BackLink";
+import ConfirmPendingPayment from "@/components/ConfirmPendingPayment";
 
 export default function CheckoutPage() {
 
     const supabase = createClient();
 
-    const { cart } = useCart();
+    const { cart, isReady } = useCart();
 
     const [loading, setLoading] = useState(true);
     const [user, setUser] = useState<any>(null);
@@ -96,10 +97,9 @@ export default function CheckoutPage() {
                 return;
             }
 
-            if (data.init_point) {
-
-                window.location.href = data.init_point;
-
+            if (data.checkout_url || data.init_point) {
+                localStorage.setItem("pending_cart_id", cartId || "");
+                window.location.href = data.checkout_url || data.init_point;
             } else {
 
                 setCheckoutError("Error al conectar con Mercado Pago");
@@ -115,7 +115,7 @@ export default function CheckoutPage() {
         }
     };
 
-    if (loading) {
+    if (loading || !isReady) {
 
         return <p className="p-6">Cargando...</p>;
     }
@@ -169,6 +169,15 @@ export default function CheckoutPage() {
             </h1>
 
             <div className="space-y-4">
+
+                {cart.length === 0 && (
+                    <p className="text-gray-500 border rounded p-4">
+                        No hay productos en el carrito.{" "}
+                        <Link href="/products" className="underline">
+                            Volver al catálogo
+                        </Link>
+                    </p>
+                )}
 
                 {cart.map((item) => (
 
@@ -258,6 +267,12 @@ export default function CheckoutPage() {
                     className="mt-4 rounded-md border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800"
                 >
                     {checkoutError}
+                </div>
+            )}
+
+            {cart.length > 0 && (
+                <div className="mt-8 border-t pt-6">
+                    <ConfirmPendingPayment />
                 </div>
             )}
 

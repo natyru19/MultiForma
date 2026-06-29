@@ -2,8 +2,30 @@ import { NextResponse } from "next/server";
 import { cartService, StockError } from "@/app/services/cart.service";
 import { createClient } from "@/lib/supabase/server";
 
-export async function GET() {
-    return NextResponse.json({ ok: true });
+export async function GET(request: Request) {
+    try {
+        const { searchParams } = new URL(request.url);
+        const cartId = searchParams.get("cart_id");
+
+        if (!cartId) {
+            return NextResponse.json({ data: { items: [] } });
+        }
+
+        const items = await cartService.getCartItems(cartId);
+
+        return NextResponse.json({
+            data: {
+                cart_id: cartId,
+                items,
+            },
+        });
+    } catch (error) {
+        console.error("Error al obtener carrito:", error);
+        return NextResponse.json(
+            { error: "Error al obtener el carrito" },
+            { status: 500 }
+        );
+    }
 }
 
 export async function POST(request: Request) {

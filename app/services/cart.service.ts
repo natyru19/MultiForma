@@ -19,6 +19,18 @@ export const cartService = {
     }) {
         let currentCartId = cart_id;
 
+        if (currentCartId) {
+            const { data: existingCart } = await supabaseAdmin
+                .from("carts")
+                .select("id")
+                .eq("id", currentCartId)
+                .maybeSingle();
+
+            if (!existingCart) {
+                currentCartId = undefined;
+            }
+        }
+
         if (!currentCartId) {
             const { data: newCart, error } = await supabaseAdmin
                 .from("carts")
@@ -74,6 +86,31 @@ export const cartService = {
             cart_id: currentCartId,
             items: cart,
         };
+    },
+
+    async getCartItems(cart_id: string) {
+        const { data: cartExists } = await supabaseAdmin
+            .from("carts")
+            .select("id")
+            .eq("id", cart_id)
+            .maybeSingle();
+
+        if (!cartExists) {
+            return [];
+        }
+
+        const { data: cart, error } = await supabaseAdmin
+            .from("cart_items")
+            .select(`
+            *,
+            products (*),
+            variants (*)
+        `)
+            .eq("cart_id", cart_id);
+
+        if (error) throw error;
+
+        return cart ?? [];
     },
 
     async updateQuantity(cart_item_id: string, quantity: number) {
