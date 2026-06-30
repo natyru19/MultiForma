@@ -1,6 +1,7 @@
 import Link from "next/link";
 import LogoutButton from "./LogoutButton";
 import { createClient } from "@/lib/supabase/server";
+import { getCurrentProfile } from "@/app/lib/getCurrentProfile";
 
 export default async function Navbar() {
 
@@ -9,6 +10,9 @@ export default async function Navbar() {
     const {
         data: { user },
     } = await supabase.auth.getUser();
+
+    const profile = user ? await getCurrentProfile() : null;
+    const isAdmin = profile?.role === "admin";
 
     return (
         <nav className="w-full border-b p-4 flex justify-between items-center">
@@ -26,6 +30,15 @@ export default async function Navbar() {
                         <Link href="/orders">
                             Mis compras
                         </Link>
+
+                        {isAdmin && (
+                            <Link
+                                href="/admin"
+                                className="font-medium text-[var(--primary,#000)]"
+                            >
+                                Administración
+                            </Link>
+                        )}
 
                         <LogoutButton />
                     </>

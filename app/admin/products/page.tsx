@@ -1,6 +1,7 @@
 import Link from "next/link";
 import BackLink from "@/components/BackLink";
 import { redirect } from "next/navigation";
+import DeleteProductButton from "./DeleteProductButton";
 
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/app/lib/getCurrentProfile";
@@ -89,12 +90,19 @@ export default async function AdminProductsPage() {
                             </div>
                         </div>
 
-                        <Link
-                            href={`/admin/products/${product.id}/edit`}
-                            className="border px-4 py-2 rounded shrink-0 hover:bg-gray-50"
-                        >
-                            Editar
-                        </Link>
+                        <div className="flex gap-2 shrink-0">
+                            <Link
+                                href={`/admin/products/${product.id}/edit`}
+                                className="border px-4 py-2 rounded hover:bg-gray-50"
+                            >
+                                Editar
+                            </Link>
+
+                            <DeleteProductButton
+                                productId={product.id}
+                                productName={product.name}
+                            />
+                        </div>
                     </div>
                 ))}
             </div>
