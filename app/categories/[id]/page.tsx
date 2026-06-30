@@ -14,7 +14,8 @@ export default async function CategoryDetail({
     const { data: products, error } = await supabase
         .from("products")
         .select("*")
-        .eq("category_slug", id);
+        .eq("category_slug", id)
+        .eq("active", true);
 
     if (error) {
         return <p>Error cargando productos</p>;

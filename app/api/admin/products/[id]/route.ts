@@ -102,6 +102,29 @@ export async function PATCH(req: Request, context: RouteContext) {
         const { id } = await context.params;
         const body = await req.json();
 
+        if (typeof body.active === "boolean") {
+            const { data: product, error } = await db
+                .from("products")
+                .update({ active: body.active })
+                .eq("id", id)
+                .select()
+                .single();
+
+            if (error) {
+                console.error("ERROR ACTUALIZANDO ESTADO:", error);
+                if (error.code === "42501") return rlsErrorResponse("el producto");
+                return NextResponse.json(
+                    { error: "Error al actualizar el estado del producto" },
+                    { status: 500 }
+                );
+            }
+
+            return NextResponse.json({
+                message: body.active ? "Producto activado" : "Producto desactivado",
+                data: product,
+            });
+        }
+
         const { name, description, image, category_id, featured } = body;
 
         if (!name || !description || !category_id) {

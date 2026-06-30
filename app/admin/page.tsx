@@ -4,6 +4,9 @@ import { redirect } from "next/navigation";
 
 import { getCurrentProfile } from "@/app/lib/getCurrentProfile";
 
+const adminLinkClass =
+    "block border border-gray-300 rounded-lg p-4 text-gray-900 hover:bg-gray-100 hover:border-gray-400 transition";
+
 export default async function AdminPage() {
     const profile = await getCurrentProfile();
 
@@ -24,11 +27,21 @@ export default async function AdminPage() {
             </h1>
 
             <div className="space-y-4">
+                <Link href="/admin/products" className={adminLinkClass}>
+                    <span className="font-medium">Gestionar productos</span>
+                    <p className="text-sm text-gray-600 mt-1">
+                        Productos activos visibles en la tienda
+                    </p>
+                </Link>
+
                 <Link
-                    href="/admin/products"
-                    className="block border rounded p-4 hover:bg-gray-50 transition"
+                    href="/admin/products?status=inactive"
+                    className={adminLinkClass}
                 >
-                    Gestionar productos
+                    <span className="font-medium">Productos inactivos</span>
+                    <p className="text-sm text-gray-600 mt-1">
+                        Productos ocultos temporalmente en la tienda
+                    </p>
                 </Link>
             </div>
         </div>

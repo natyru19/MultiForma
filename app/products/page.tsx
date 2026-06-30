@@ -12,7 +12,8 @@ export default async function ProductsPage() {
             *,
             categories:category_id (*),
             variants:variants!product_id (*)
-        `);
+        `)
+        .eq("active", true);
 
     if (error) {
         console.error(error);

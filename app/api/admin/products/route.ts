@@ -130,6 +130,7 @@ export async function POST(req: Request) {
                 image: productImage,
                 category_id,
                 featured: featured ?? false,
+                active: true,
                 category_slug: category.slug,
             })
             .select()

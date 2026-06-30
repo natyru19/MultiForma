@@ -14,28 +14,30 @@ export default function ProductDetail({
     }) {
     const { id } = use(params);
 
-    const [product, setProduct] = useState<any>(null);
+    const [product, setProduct] = useState<any | undefined>(undefined);
     const [selectedOption, setSelectedOption] = useState("");
     const [selectedColor, setSelectedColor] = useState("");
     const [currentIndex, setCurrentIndex] = useState(0);
     const [quantity, setQuantity] = useState(1);
 
     useEffect(() => {
-        const fetchProduct = async () => {
+        async function fetchProduct() {
+            setProduct(undefined);
 
-        const supabase = createClient();
+            const supabase = createClient();
 
-        const { data, error } = await supabase
-            .from("products")
-            .select(`
+            const { data, error } = await supabase
+                .from("products")
+                .select(`
                 *,
                 variants:variants!product_id (*)
             `)
-            .eq("id", id)
-            .single();
+                .eq("id", id)
+                .eq("active", true)
+                .single();
 
-        if (!error) setProduct(data);
-        };
+            setProduct(!error && data ? data : null);
+        }
 
         fetchProduct();
     }, [id]);
@@ -44,7 +46,20 @@ export default function ProductDetail({
         setQuantity(1);
     }, [selectedOption, selectedColor]);
 
-    if (!product) return <p className="p-6">Cargando...</p>;
+    if (product === undefined) {
+        return <p className="p-6">Cargando...</p>;
+    }
+
+    if (product === null) {
+        return (
+            <div className="p-6 max-w-5xl mx-auto">
+                <BackLink href="/products" label="Catálogo" className="mb-6" />
+                <p className="text-gray-600">
+                    Este producto no está disponible en este momento.
+                </p>
+            </div>
+        );
+    }
 
     const variants = product.variants ?? [];
 
