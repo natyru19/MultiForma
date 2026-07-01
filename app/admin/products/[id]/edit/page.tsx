@@ -24,18 +24,42 @@ export default async function EditProductPage({ params }: PageProps) {
 
     const supabase = await createClient();
 
-    const [{ data: product, error: productError }, { data: categories }] =
+    const [{ data: product, error: productError }, { data: activeCategories }] =
         await Promise.all([
             supabase
                 .from("products")
                 .select("*")
                 .eq("id", id)
                 .single(),
-            supabase.from("categories").select("id, name").order("name"),
+            supabase
+                .from("categories")
+                .select("id, name")
+                .eq("active", true)
+                .order("name"),
         ]);
 
     if (productError || !product) {
         notFound();
+    }
+
+    let categories = activeCategories || [];
+
+    const hasCurrentCategory = categories.some(
+        (category) => category.id === product.category_id
+    );
+
+    if (!hasCurrentCategory && product.category_id) {
+        const { data: currentCategory } = await supabase
+            .from("categories")
+            .select("id, name")
+            .eq("id", product.category_id)
+            .maybeSingle();
+
+        if (currentCategory) {
+            categories = [...categories, currentCategory].sort((a, b) =>
+                a.name.localeCompare(b.name)
+            );
+        }
     }
 
     const { data: variants } = await supabase

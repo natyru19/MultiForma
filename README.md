@@ -13,6 +13,8 @@ Ecommerce de diseños personalizados e impresión 3D. Catálogo con variantes, c
 - Catálogo de productos activos y navegación por categorías
 - Los productos inactivos permanecen ocultos para los clientes
 - Detalle de producto con selector de variantes, cantidad y stock disponible
+- Solo se muestran categorías activas
+- Las categorías inactivas permanecen ocultas para los clientes
 - Carrito persistente (usuario anónimo o autenticado)
 - Checkout protegido (requiere iniciar sesión)
 - Pago con Mercado Pago y confirmación de orden vía webhook + página de éxito
@@ -32,6 +34,7 @@ Ecommerce de diseños personalizados e impresión 3D. Catálogo con variantes, c
 
 - Acceso directo **Administración** en el navbar (solo usuarios con `role = admin`)
 - CRUD de productos: listar, crear, editar y eliminar
+- CRUD de categorías: listar, crear, editar y eliminar
 - Gestión de variantes (precio, stock, opción, color, imagen)
 - Carga de imágenes desde el navegador mediante Supabase Storage
 - Gestión de productos activos e inactivos
@@ -188,5 +191,5 @@ MultiForma es un ecommerce funcional desplegado en Vercel con:
 - Flujo completo de compra (catálogo → carrito → checkout → pago → orden)
 - Autenticación, perfiles y carrito persistente
 - Integración con Mercado Pago en producción
-- Panel admin con CRUD de productos, variantes y gestión de visibilidad
+- Panel admin con CRUD de productos, categorías, variantes y gestión de visibilidad
 - Control de stock en tiempo real

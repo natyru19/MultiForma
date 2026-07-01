@@ -43,6 +43,23 @@ export default async function AdminPage() {
                         Productos ocultos temporalmente en la tienda
                     </p>
                 </Link>
+
+                <Link href="/admin/categories" className={adminLinkClass}>
+                    <span className="font-medium">Gestionar categorías</span>
+                    <p className="text-sm text-gray-600 mt-1">
+                        Categorías activas visibles en la tienda
+                    </p>
+                </Link>
+
+                <Link
+                    href="/admin/categories?status=inactive"
+                    className={adminLinkClass}
+                >
+                    <span className="font-medium">Categorías inactivas</span>
+                    <p className="text-sm text-gray-600 mt-1">
+                        Categorías ocultas temporalmente en la tienda
+                    </p>
+                </Link>
             </div>
         </div>
     );

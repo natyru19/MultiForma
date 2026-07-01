@@ -8,6 +8,7 @@ export default async function CategoriesPage() {
     const { data: categories, error } = await supabase
         .from("categories")
         .select("*")
+        .eq("active", true)
         .order("name");
 
     if (error) {

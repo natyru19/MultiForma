@@ -22,6 +22,7 @@ export default async function NewProductPage() {
     const { data: categories, error } = await supabase
         .from("categories")
         .select("id, name")
+        .eq("active", true)
         .order("name");
 
     if (error) {

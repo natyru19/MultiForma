@@ -6,7 +6,8 @@ export async function getCategories() {
     
     const { data, error } = await supabase
         .from("categories")
-        .select("*");
+        .select("*")
+        .eq("active", true);
 
     if (error) {
         console.error(error);
