@@ -93,13 +93,25 @@ export const orderService = {
         try {
             await stockService.deductForCartItems(pricedCart);
 
-            const orderItems = pricedCart.map((item) => ({
-                order_id: createdOrder.id,
-                product_id: item.product_id,
-                variant_id: item.variant_id || null,
-                quantity: item.quantity,
-                price: item.price,
-            }));
+            const orderItems = pricedCart.map((item) => {
+                const originalItem = cart.find(
+                    (entry) =>
+                        entry.product_id === item.product_id &&
+                        entry.variant_id === item.variant_id
+                );
+                const originalPrice = originalItem?.price ?? item.price;
+
+                return {
+                    order_id: createdOrder.id,
+                    product_id: item.product_id,
+                    variant_id: item.variant_id || null,
+                    quantity: item.quantity,
+                    price: item.price,
+                    original_price: welcomeDiscountApplied
+                        ? originalPrice
+                        : null,
+                };
+            });
 
             const { error: itemsError } = await supabaseAdmin
                 .from("order_items")

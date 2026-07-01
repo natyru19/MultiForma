@@ -13,7 +13,7 @@ export default function RegisterForm() {
     const searchParams = useSearchParams();
 
     const redirectTo = searchParams.get("redirect") || "/login";
-    const isCheckoutPromo = redirectTo === "/checkout";
+    const isWelcomePromo = redirectTo === "/products";
 
     const [fullName, setFullName] = useState("");
     const [email, setEmail] = useState("");
@@ -124,7 +124,7 @@ export default function RegisterForm() {
 
             <h1 className="text-3xl font-bold mb-2">Registro</h1>
             <p className="text-gray-600 mb-6">
-                {isCheckoutPromo
+                {isWelcomePromo
                     ? "Creá tu cuenta y obtené 10% de descuento en tu primera compra."
                     : "Creá tu cuenta para comprar y ver tus pedidos."}
             </p>

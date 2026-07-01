@@ -21,6 +21,7 @@ Ecommerce de diseños personalizados e impresión 3D. Catálogo con variantes, c
 - Aplicación automática del descuento durante el checkout
 - Pago con Mercado Pago y confirmación de orden vía webhook + página de éxito
 - Historial de compras
+- Desglose de subtotal, descuentos y total pagado en cada pedido
 - Registro e inicio de sesión
 - Asociación automática del carrito anónimo al registrarse o iniciar sesión
 
