@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import ImageUploadField from "@/components/admin/ImageUploadField";
 
 type Category = {
     id: string;
@@ -58,9 +59,14 @@ export default function EditProductForm({
     const [productError, setProductError] = useState("");
     const [variantError, setVariantError] = useState("");
     const [variantSuccess, setVariantSuccess] = useState("");
+    const [productImageUploading, setProductImageUploading] = useState(false);
+    const [variantImageUploading, setVariantImageUploading] = useState(false);
+
+    const isUploading = productImageUploading || variantImageUploading;
 
     async function handleProductSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
+        if (isUploading) return;
         setProductError("");
         setSavingProduct(true);
 
@@ -89,6 +95,7 @@ export default function EditProductForm({
 
     async function handleVariantSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
+        if (isUploading) return;
         setVariantError("");
         setVariantSuccess("");
         setAddingVariant(true);
@@ -154,16 +161,13 @@ export default function EditProductForm({
                     />
                 </div>
 
-                <div>
-                    <label className="block mb-1 font-medium">Imagen principal (URL)</label>
-                    <input
-                        type="url"
-                        className="w-full border rounded p-3"
-                        value={image}
-                        onChange={(e) => setImage(e.target.value)}
-                        placeholder="https://..."
-                    />
-                </div>
+                <ImageUploadField
+                    label="Imagen principal"
+                    value={image}
+                    onChange={setImage}
+                    optional
+                    onUploadingChange={setProductImageUploading}
+                />
 
                 <div>
                     <label className="block mb-1 font-medium">Categoría</label>
@@ -197,7 +201,7 @@ export default function EditProductForm({
 
                 <button
                     type="submit"
-                    disabled={savingProduct}
+                    disabled={savingProduct || isUploading}
                     className="bg-black text-white px-6 py-3 rounded disabled:opacity-50"
                 >
                     {savingProduct ? "Guardando..." : "Guardar cambios"}
@@ -318,23 +322,18 @@ export default function EditProductForm({
                     </div>
                 </div>
 
-                <div>
-                    <label className="block mb-1 font-medium">
-                        Imagen de la variante{" "}
-                        <span className="text-gray-400 font-normal">(opcional)</span>
-                    </label>
-                    <input
-                        type="url"
-                        className="w-full border rounded p-3"
-                        value={variantImage}
-                        onChange={(e) => setVariantImage(e.target.value)}
-                        placeholder="Si no completás, se usa la imagen principal"
-                    />
-                </div>
+                <ImageUploadField
+                    label="Imagen de la variante"
+                    value={variantImage}
+                    onChange={setVariantImage}
+                    optional
+                    hint="Si no subís una, se usa la imagen principal del producto."
+                    onUploadingChange={setVariantImageUploading}
+                />
 
                 <button
                     type="submit"
-                    disabled={addingVariant}
+                    disabled={addingVariant || isUploading}
                     className="bg-black text-white px-6 py-3 rounded disabled:opacity-50"
                 >
                     {addingVariant ? "Agregando..." : "Agregar variante"}

@@ -33,6 +33,7 @@ Ecommerce de diseños personalizados e impresión 3D. Catálogo con variantes, c
 - Acceso directo **Administración** en el navbar (solo usuarios con `role = admin`)
 - CRUD de productos: listar, crear, editar y eliminar
 - Gestión de variantes (precio, stock, opción, color, imagen)
+- Carga de imágenes desde el navegador mediante Supabase Storage
 - Gestión de productos activos e inactivos
 - Rutas protegidas por rol
 
@@ -50,7 +51,8 @@ Ecommerce de diseños personalizados e impresión 3D. Catálogo con variantes, c
 |------|------------|
 | Framework | Next.js 16 (App Router) |
 | UI | React 19, TypeScript, Tailwind CSS 4 |
-| Base de datos / Auth | Supabase (PostgreSQL + Supabase Auth) |
+| Base de datos / Auth | Supabase (PostgreSQL + Auth) |
+| Almacenamiento | Supabase Storage |
 | Pagos | Mercado Pago API + Webhooks |
 | Deploy | Vercel |
 
