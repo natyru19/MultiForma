@@ -1,6 +1,7 @@
 import ProductCard from "@/components/ProductCard";
 import { getCategories } from "@/lib/getCategories";
 import CategoriesSlider from "@/components/CategoriesSlider";
+import HomePromoBanner from "@/components/HomePromoBanner";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function Home() {
@@ -29,9 +30,7 @@ export default async function Home() {
 
         <p className="mt-4">Creamos lo que imagines</p>
 
-        <button className="mt-6 bg-[var(--accent)] hover:bg-[var(--accent-hover)] font-semibold px-6 py-2 rounded">
-          Registrate y obtené 10% OFF
-        </button>
+        <HomePromoBanner />
       </section>
 
       <section className="mt-16">

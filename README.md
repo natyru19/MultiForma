@@ -17,6 +17,8 @@ Ecommerce de diseños personalizados e impresión 3D. Catálogo con variantes, c
 - Las categorías inactivas permanecen ocultas para los clientes
 - Carrito persistente (usuario anónimo o autenticado)
 - Checkout protegido (requiere iniciar sesión)
+- Beneficio del 10% de descuento en la primera compra para usuarios registrados
+- Aplicación automática del descuento durante el checkout
 - Pago con Mercado Pago y confirmación de orden vía webhook + página de éxito
 - Historial de compras
 - Registro e inicio de sesión
@@ -25,6 +27,7 @@ Ecommerce de diseños personalizados e impresión 3D. Catálogo con variantes, c
 ### Pagos (Mercado Pago)
 
 - Creación de preferencia de pago con metadata del cliente y carrito
+- Cálculo del descuento de primera compra del lado del servidor
 - Webhooks con manejo de pagos pendientes
 - Prevención de órdenes duplicadas
 - Descuento de stock al aprobarse el pago
@@ -181,6 +184,7 @@ lib/                    # Supabase clients, appUrl, helpers
 | `/login` `/register` | Autenticación |
 | `/admin` | Panel admin |
 | `/admin/products` | Gestión de productos |
+| `/admin/categories` | Gestión de categorías |
 
 ---
 
@@ -189,6 +193,7 @@ lib/                    # Supabase clients, appUrl, helpers
 MultiForma es un ecommerce funcional desplegado en Vercel con:
 
 - Flujo completo de compra (catálogo → carrito → checkout → pago → orden)
+- Descuento automático del 10% en la primera compra de usuarios registrados
 - Autenticación, perfiles y carrito persistente
 - Integración con Mercado Pago en producción
 - Panel admin con CRUD de productos, categorías, variantes y gestión de visibilidad

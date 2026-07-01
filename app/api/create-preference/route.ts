@@ -2,11 +2,15 @@ import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { stockService, StockError } from "@/app/services/stock.service";
 import { getMercadoPagoUrls } from "@/lib/appUrl";
+import {
+    applyWelcomeDiscountToCart,
+    getWelcomeDiscountSummary,
+} from "@/app/services/discount.service";
 
 export async function POST(req: Request) {
     try {
         const body = await req.json();
-        const { items, cartId, form, userId } = body;
+        const { cartId, form, userId } = body;
 
         if (!cartId) {
             return NextResponse.json(
@@ -24,7 +28,10 @@ export async function POST(req: Request) {
 
         const { data: cartItems, error: cartError } = await supabaseAdmin
             .from("cart_items")
-            .select("*")
+            .select(`
+                *,
+                products (name)
+            `)
             .eq("cart_id", cartId);
 
         if (cartError || !cartItems?.length) {
@@ -35,6 +42,34 @@ export async function POST(req: Request) {
         }
 
         await stockService.validateCartStock(cartItems);
+
+        const discountSummary = await getWelcomeDiscountSummary(
+            userId,
+            cartItems.map((item) => ({
+                price: Number(item.price),
+                quantity: item.quantity,
+            }))
+        );
+
+        const pricedCart = discountSummary.eligible
+            ? applyWelcomeDiscountToCart(
+                  cartItems.map((item) => ({
+                      ...item,
+                      price: Number(item.price),
+                  }))
+              )
+            : cartItems.map((item) => ({
+                  ...item,
+                  price: Number(item.price),
+              }));
+
+        const mpItems = pricedCart.map((item) => ({
+            title:
+                (item.products as { name?: string } | null)?.name || "Producto",
+            quantity: item.quantity,
+            unit_price: item.price,
+            currency_id: "UYU",
+        }));
 
         let mpUrls;
 
@@ -60,21 +95,9 @@ export async function POST(req: Request) {
                     Authorization: `Bearer ${process.env.MP_ACCESS_TOKEN}`,
                 },
                 body: JSON.stringify({
-                    items: items.map(
-                        (item: {
-                            title: string;
-                            quantity: number;
-                            unit_price: number;
-                        }) => ({
-                            ...item,
-                            currency_id: "UYU",
-                        })
-                    ),
-
+                    items: mpItems,
                     external_reference: String(cartId),
-
                     notification_url: mpUrls.notification_url,
-
                     metadata: {
                         cart_id: String(cartId),
                         user_id: String(userId || ""),
@@ -82,10 +105,14 @@ export async function POST(req: Request) {
                         customer_email: String(form.email || ""),
                         customer_phone: String(form.phone || ""),
                         customer_address: String(form.address || ""),
+                        welcome_discount_applied: discountSummary.eligible
+                            ? "true"
+                            : "false",
+                        discount_amount: String(discountSummary.discountAmount),
+                        discount_percent: String(discountSummary.discountPercent),
+                        subtotal: String(discountSummary.subtotal),
                     },
-
                     back_urls: mpUrls.back_urls,
-
                     auto_return: "approved",
                 }),
             }
@@ -112,6 +139,7 @@ export async function POST(req: Request) {
             ...data,
             checkout_url: checkoutUrl,
             mp_mode: mpUrls.mode,
+            discount: discountSummary,
         });
     } catch (error) {
         if (error instanceof StockError) {

@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 import BackLink from "@/components/BackLink";
 import ConfirmPendingPayment from "@/components/ConfirmPendingPayment";
+import type { WelcomeDiscountSummary } from "@/app/services/discount.service";
 
 export default function CheckoutPage() {
 
@@ -16,11 +17,6 @@ export default function CheckoutPage() {
     const [loading, setLoading] = useState(true);
     const [user, setUser] = useState<any>(null);
 
-    const total = cart.reduce(
-        (acc, item) => acc + item.price * item.quantity,
-        0
-    );
-
     const [form, setForm] = useState({
         name: "",
         email: "",
@@ -29,23 +25,73 @@ export default function CheckoutPage() {
     });
     const [checkoutError, setCheckoutError] = useState("");
     const [paying, setPaying] = useState(false);
+    const [discount, setDiscount] = useState<WelcomeDiscountSummary | null>(
+        null
+    );
+
+    const subtotal = cart.reduce(
+        (acc, item) => acc + item.price * item.quantity,
+        0
+    );
+
+    const discountAmount = discount?.eligible ? discount.discountAmount : 0;
+    const total = discount?.eligible ? discount.total : subtotal;
 
     useEffect(() => {
-
-        const checkUser = async () => {
-
+        async function checkUser() {
             const {
                 data: { user },
             } = await supabase.auth.getUser();
 
             setUser(user);
 
+            if (user?.email) {
+                setForm((current) => ({
+                    ...current,
+                    email: current.email || user.email || "",
+                }));
+            }
+
             setLoading(false);
-        };
+        }
 
         checkUser();
-
     }, []);
+
+    useEffect(() => {
+        async function loadDiscount() {
+            if (!user || cart.length === 0) {
+                setDiscount(null);
+                return;
+            }
+
+            const cartId = localStorage.getItem("cart_id");
+            if (!cartId) {
+                setDiscount(null);
+                return;
+            }
+
+            try {
+                const response = await fetch(
+                    `/api/checkout/welcome-discount?cart_id=${encodeURIComponent(cartId)}`
+                );
+
+                if (!response.ok) {
+                    setDiscount(null);
+                    return;
+                }
+
+                const data = await response.json();
+                setDiscount(data);
+            } catch {
+                setDiscount(null);
+            }
+        }
+
+        if (isReady && user) {
+            loadDiscount();
+        }
+    }, [user, cart, isReady]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 
@@ -78,12 +124,6 @@ export default function CheckoutPage() {
                 },
 
                 body: JSON.stringify({
-                    items: cart.map((item) => ({
-                        title: item.name,
-                        quantity: item.quantity,
-                        unit_price: item.price,
-                    })),
-
                     cartId,
                     form,
                     userId: user.id,
@@ -133,7 +173,8 @@ export default function CheckoutPage() {
                 </h1>
 
                 <p className="text-gray-600 mb-6">
-                    Inicia sesión o crea una cuenta para continuar con tu compra.
+                    Iniciá sesión o creá tu cuenta para continuar. Si es tu primera
+                    compra, obtenés 10% de descuento al registrarte.
                 </p>
 
                 <div className="flex gap-4 justify-center">
@@ -249,8 +290,31 @@ export default function CheckoutPage() {
 
             </div>
 
-            <div className="mt-6 text-xl font-bold">
-                Total: ${total}
+            <div className="mt-6 border rounded-lg p-4 space-y-2 max-w-md">
+                <div className="flex justify-between text-gray-700">
+                    <span>Subtotal</span>
+                    <span>${subtotal}</span>
+                </div>
+
+                {discount?.eligible && (
+                    <div className="flex justify-between text-green-700">
+                        <span>
+                            Descuento primera compra ({discount.discountPercent}%)
+                        </span>
+                        <span>- ${discountAmount}</span>
+                    </div>
+                )}
+
+                <div className="flex justify-between text-xl font-bold border-t pt-2">
+                    <span>Total</span>
+                    <span>${total}</span>
+                </div>
+
+                {discount?.eligible && (
+                    <p className="text-sm text-green-700">
+                        ¡Descuento de bienvenida aplicado!
+                    </p>
+                )}
             </div>
 
             <button

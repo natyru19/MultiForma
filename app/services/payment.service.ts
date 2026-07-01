@@ -177,11 +177,20 @@ export async function processApprovedPayment(
     }
 
     try {
+        const metadata = (payment.metadata ?? {}) as Record<string, string>;
+        const welcomeDiscountApplied =
+            metadata.welcome_discount_applied === "true";
+        const discountAmount = Number(metadata.discount_amount || 0);
+        const subtotal = Number(metadata.subtotal || 0);
+
         const order = await orderService.createOrder({
             cart: cartItems,
             form: customer,
             userId,
             paymentId,
+            welcomeDiscountApplied,
+            subtotal: subtotal || undefined,
+            discountAmount,
         });
 
         await supabaseAdmin
