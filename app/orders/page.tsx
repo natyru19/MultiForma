@@ -17,7 +17,6 @@ type Order = {
     total: number;
     subtotal: number | null;
     discount_amount: number | null;
-    status: string;
     created_at: string;
     order_items: OrderItem[];
 };
@@ -75,7 +74,7 @@ export default async function OrdersPage() {
     const orderList = (orders || []) as Order[];
 
     return (
-        <div className="max-w-4xl mx-auto p-6">
+        <div className="max-w-4xl mx-auto p-6 text-[var(--foreground)]">
             <BackLink href="/" label="Inicio" className="mb-6" />
 
             <h1 className="text-3xl font-bold mb-6">Mis compras</h1>
@@ -97,19 +96,25 @@ export default async function OrdersPage() {
                     return (
                         <div
                             key={order.id}
-                            className="border rounded-lg p-5 space-y-4"
+                            className="rounded-lg border border-gray-200 bg-white p-5 text-[var(--dark)] shadow-sm space-y-4"
                         >
-                            <div className="flex flex-wrap justify-between gap-2 text-sm text-gray-600">
+                            <div className="flex flex-wrap justify-between gap-2 text-sm">
                                 <p>
-                                    <span className="font-semibold text-gray-900">
+                                    <span className="font-semibold">
                                         Pedido
                                     </span>{" "}
-                                    #{order.id.slice(0, 8)}
+                                    <span className="text-[var(--muted)]">
+                                        #{order.id.slice(0, 8)}
+                                    </span>
                                 </p>
-                                <p>
+                                <p className="text-[var(--muted)]">
                                     {new Date(
                                         order.created_at
-                                    ).toLocaleDateString("es-UY")}
+                                    ).toLocaleDateString("es-UY", {
+                                        day: "numeric",
+                                        month: "long",
+                                        year: "numeric",
+                                    })}
                                 </p>
                             </div>
 
@@ -127,53 +132,53 @@ export default async function OrdersPage() {
                                     return (
                                         <div
                                             key={index}
-                                            className="border rounded p-3 bg-gray-50"
+                                            className="rounded border border-gray-200 bg-[var(--light)] p-3"
                                         >
-                                            <p className="font-semibold">
+                                            <p className="font-semibold text-[var(--dark)]">
                                                 {item.products?.name}
                                             </p>
 
                                             {(item.variants?.option ||
                                                 item.variants?.color) && (
-                                                <p className="text-sm text-gray-500">
+                                                <p className="text-sm text-[var(--muted)]">
                                                     {item.variants?.option}
                                                     {item.variants?.color &&
                                                         ` | ${item.variants.color}`}
                                                 </p>
                                             )}
 
-                                            <p className="text-sm mt-1">
+                                            <p className="text-sm mt-1 text-[var(--dark)]">
                                                 Cantidad: {item.quantity}
                                             </p>
 
                                             {showItemDiscount ? (
                                                 <div className="text-sm mt-2 space-y-1">
-                                                    <p>
+                                                    <p className="text-[var(--dark)]">
                                                         Precio unitario:{" "}
-                                                        <span className="line-through text-gray-500">
+                                                        <span className="line-through text-[var(--muted)]">
                                                             ${originalUnit}
                                                         </span>
                                                     </p>
-                                                    <p className="text-green-700">
+                                                    <p className="text-[var(--accent)] font-medium">
                                                         Descuento primera
                                                         compra (
                                                         {WELCOME_DISCOUNT_PERCENT}
                                                         %): -${unitDiscount}{" "}
                                                         c/u
                                                     </p>
-                                                    <p className="font-medium">
+                                                    <p className="font-semibold text-[var(--dark)]">
                                                         Precio pagado: $
                                                         {paidUnit} c/u
                                                     </p>
                                                 </div>
                                             ) : (
-                                                <p className="text-sm mt-1">
+                                                <p className="text-sm mt-1 text-[var(--dark)]">
                                                     Precio unitario: $
                                                     {paidUnit}
                                                 </p>
                                             )}
 
-                                            <p className="text-sm font-medium mt-1">
+                                            <p className="text-sm font-semibold mt-2 text-[var(--primary-dark)]">
                                                 Subtotal ítem: $
                                                 {paidUnit * item.quantity}
                                             </p>
@@ -182,14 +187,14 @@ export default async function OrdersPage() {
                                 })}
                             </div>
 
-                            <div className="border-t pt-4 space-y-1 max-w-sm ml-auto text-sm">
+                            <div className="border-t border-gray-200 pt-4 space-y-2 max-w-sm ml-auto text-sm">
                                 {hasDiscount && (
                                     <>
-                                        <div className="flex justify-between">
+                                        <div className="flex justify-between text-[var(--dark)]">
                                             <span>Subtotal</span>
                                             <span>${orderSubtotal}</span>
                                         </div>
-                                        <div className="flex justify-between text-green-700">
+                                        <div className="flex justify-between text-[var(--accent)] font-medium">
                                             <span>
                                                 Descuento primera compra (
                                                 {WELCOME_DISCOUNT_PERCENT}%)
@@ -198,21 +203,19 @@ export default async function OrdersPage() {
                                         </div>
                                     </>
                                 )}
-                                <div className="flex justify-between text-base font-bold border-t pt-2">
+                                <div className="flex justify-between text-base font-bold border-t border-gray-200 pt-2 text-[var(--primary-dark)]">
                                     <span>Total pagado</span>
                                     <span>${order.total}</span>
                                 </div>
                             </div>
-
-                            <p className="text-sm text-gray-500">
-                                Estado: {order.status}
-                            </p>
                         </div>
                     );
                 })}
 
                 {orderList.length === 0 && (
-                    <p>No tenés compras todavía.</p>
+                    <p className="text-[var(--muted)]">
+                        No tenés compras todavía.
+                    </p>
                 )}
             </div>
         </div>
